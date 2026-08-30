@@ -27,7 +27,13 @@ always-on task olarak `scheduler.py` calisiyor)
     Turkiye saatiyle gunde 1 kez calisir. Sayfasi
     `templates/sp500_concentration.html` icinde Chart.js ile ozel bir dual-axis
     grafik (fiyat + 3 aylik fark, 200g ortalamaya gore arka plan golgelendirme,
-    lejanttan acilir/kapanir).
+    lejanttan acilir/kapanir, genislik/yukseklik girisiyle boyutu ayarlanabilir).
+  - `sp500_breadth.py` - SPCFD:SPX (fiyat) ve INDEX:S5TH (S&P 500 hisselerinin
+    200g ortalamanin uzerinde olan yuzdesi, "genislik/breadth") icin
+    TradingView'den gunluk veri ceker, 2019-01-01'den itibaren. `daily_at_tr=
+    "23:00"`. Sayfasi `templates/sp500_breadth.html` icinde dual-axis grafik
+    (fiyat cizgisi + breadth bar chart), lejanttan acilir/kapanir, genislik/
+    yukseklik girisiyle boyutu ayarlanabilir.
 - `storage.py` - veriyi `data/<key>.json` olarak yazar/okur.
 - `scheduler.py` - surekli calisan process; her kaynagi kendi frekansinda tetikler.
   PythonAnywhere'de bir **Always-on task** olarak calistirilir.

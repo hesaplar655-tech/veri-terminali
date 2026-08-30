@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}{{ source.title }} - Veri Terminali{% endblock %}
+{% block content %}
+  <p><a href="{{ url_for('panel') }}">&larr; panel</a></p>
+  <h1>{{ source.title }}</h1>
+  {% if record %}
+    <p class="ts">son guncelleme: {{ record.guncellenme_zamani }} (TR saatiyle her gun 23:00'te)</p>
+
+    <div class="chart-controls">
+      <span class="size-controls">
+        <label>Genislik (px): <input type="number" id="chart-width" min="200" max="4000" step="10" placeholder="otomatik"></label>
+        <label>Yukseklik (px): <input type="number" id="chart-height" min="150" max="3000" step="10" placeholder="otomatik"></label>
+        <button type="button" id="apply-size" class="btn-sm">Uygula</button>
+        <button type="button" id="reset-size" class="btn-sm btn-sm-ghost">Sifirla</button>
+      </span>
+    </div>
+    <div class="chart-wrap" id="chart-wrap">
+      <canvas id="chart"></canvas>
+    </div>
+    <p class="ts">
+      Turkuaz cizgi: S&amp;P 500 (SPCFD:SPX) kapanis fiyati (sol eksen).
+      Mavi cubuklar: S5TH - S&amp;P 500 hisselerinin 200 gunluk ortalamasinin
+      uzerinde olan yuzdesi, "genislik/breadth" gostergesi (sag eksen, 0-100).
+      Dusuk deger = az sayida hisse ralliye katiliyor (dar/zayif piyasa),
+      yuksek deger = genis katilim. Lejanttaki ogelere tiklayarak acip
+      kapatabilirsiniz. Veri 2019 basindan itibaren gosteriliyor.
+    </p>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script>
+      const veri = {{ record.veri | tojson }};
+      const etiketler = veri.map(d => d.tarih);
+      const spxFiyat = veri.map(d => d.spx_kapanis);
+      const s5th = veri.map(d => d.s5th_yuzde);
+
+      const ctx = document.getElementById('chart').getContext('2d');
+      const chart = new Chart(ctx, {
+        data: {
+          labels: etiketler,
+          datasets: [
+            {
+              type: 'line',
+              label: 'S&P 500 (SPX)',
+              data: spxFiyat,
+              yAxisID: 'y',
+              borderColor: '#4fd1c5',
+              backgroundColor: '#4fd1c5',
+              pointRadius: 0,
+              borderWidth: 1.5,
+              tension: 0.1,
+            },
+            {
+              type: 'bar',
+              label: '% 200 gunluk ortalama uzerinde (S5TH)',
+              data: s5th,
+              yAxisID: 'y1',
+              backgroundColor: 'rgba(79,140,224,0.75)',
+              borderWidth: 0,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: {
+              ticks: { color: '#8a90a2', maxTicksLimit: 12 },
+              grid: { color: '#1c2130' },
+            },
+            y: {
+              position: 'left',
+              ticks: { color: '#8a90a2' },
+              grid: { color: '#1c2130' },
+              title: { display: true, text: 'SPX fiyat', color: '#8a90a2' },
+            },
+            y1: {
+              position: 'right',
+              min: 0,
+              max: 100,
+              ticks: { color: '#8a90a2' },
+              grid: { display: false },
+              title: { display: true, text: '% 200g MA uzerinde', color: '#8a90a2' },
+            },
+          },
+          plugins: {
+            legend: {
+              labels: { color: '#e6e8ee' },
+            },
+          },
+        },
+      });
+
+      // Kullanicinin girdigi genislik/yukseklige gore grafik boyutu
+      const wrap = document.getElementById('chart-wrap');
+      const widthInput = document.getElementById('chart-width');
+      const heightInput = document.getElementById('chart-height');
+      const STORAGE_KEY = 'sp500_breadth_size';
+
+      function applySize(width, height) {
+        wrap.style.width = width ? width + 'px' : '';
+        wrap.style.height = height ? height + 'px' : '';
+        wrap.style.maxWidth = width ? 'none' : '';
+        wrap.style.maxHeight = height ? 'none' : '';
+        chart.resize();
+      }
+
+      function saveSize(width, height) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ width, height }));
+        } catch (e) { /* localStorage yoksa sessizce gec */ }
+      }
+
+      document.getElementById('apply-size').addEventListener('click', () => {
+        const width = parseInt(widthInput.value, 10) || null;
+        const height = parseInt(heightInput.value, 10) || null;
+        applySize(width, height);
+        saveSize(width, height);
+      });
+
+      document.getElementById('reset-size').addEventListener('click', () => {
+        widthInput.value = '';
+        heightInput.value = '';
+        applySize(null, null);
+        saveSize(null, null);
+      });
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if (saved && (saved.width || saved.height)) {
+          if (saved.width) widthInput.value = saved.width;
+          if (saved.height) heightInput.value = saved.height;
+          applySize(saved.width, saved.height);
+        }
+      } catch (e) { /* localStorage yoksa sessizce gec */ }
+    </script>
+  {% else %}
+    <p class="ts">Bu sayfa icin henuz veri cekilmedi. Scheduler calistiginda burasi dolacak (TR saatiyle her gun 23:00).</p>
+  {% endif %}
+{% endblock %}

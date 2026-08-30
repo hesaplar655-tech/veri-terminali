@@ -15,7 +15,7 @@ Zamanlama iki sekilde tanimlanabilir (birini kullan):
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from sources import ornek, ekonomik_takvim, sp500_concentration
+from sources import ornek, ekonomik_takvim, sp500_concentration, sp500_breadth
 
 
 @dataclass
@@ -40,6 +40,12 @@ SOURCES: list[Source] = [
         key="sp500_concentration",
         title="S&P 500 Konsantrasyonu",
         fetch=sp500_concentration.fetch,
+        daily_at_tr="23:00",
+    ),
+    Source(
+        key="sp500_breadth",
+        title="S&P 500 Genislik (% 200g MA Uzeri)",
+        fetch=sp500_breadth.fetch,
         daily_at_tr="23:00",
     ),
     Source(
