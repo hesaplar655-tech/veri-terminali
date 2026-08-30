@@ -19,12 +19,14 @@
     </div>
     <div id="date-range-slider"></div>
     <p class="ts">
-      Mavi (yukarida): S&amp;P 500 uyelerinin yuzde kacinin 14 gunluk RSI'i
-      70'in uzerinde (asiri alim). Turuncu (asagida, negatif eksende
-      gosteriliyor ama deger her zaman pozitif bir yuzdedir): yuzde kacinin
-      30'un altinda (asiri satim). Ham fiyat verisi Yahoo Finance'den,
-      RSI kendimiz hesapliyoruz - TradingView'de bu veriye ait hazir bir
-      ticker bulunamadi. Lejanttaki ogelere tiklayarak acip kapatabilirsiniz.
+      Turkuaz cizgi: S&amp;P 500 (SPCFD:SPX) kapanis fiyati (sol eksen,
+      TradingView'den). Mavi cubuklar (yukarida): S&amp;P 500 uyelerinin
+      yuzde kacinin 14 gunluk RSI'i 70'in uzerinde (asiri alim). Turuncu
+      cubuklar (asagida, negatif eksende gosteriliyor ama deger her zaman
+      pozitif bir yuzdedir): yuzde kacinin 30'un altinda (asiri satim).
+      RSI icin ham fiyat verisi Yahoo Finance'den, RSI'i kendimiz
+      hesapliyoruz - TradingView'de bu veriye ait hazir bir ticker
+      bulunamadi. Lejanttaki ogelere tiklayarak acip kapatabilirsiniz.
     </p>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <script src="{{ url_for('static', filename='date-range-slider.js') }}"></script>
@@ -33,24 +35,39 @@
       const etiketler = veri.map(d => d.tarih);
       const ustunde70 = veri.map(d => d.ustunde_70_yuzde);
       const altinda30 = veri.map(d => -d.altinda_30_yuzde);  // gorsel olarak eksende asagida gostermek icin negatif
+      const spxFiyat = veri.map(d => d.spx_kapanis ?? null);
 
       const ctx = document.getElementById('chart').getContext('2d');
       const chart = new Chart(ctx, {
-        type: 'bar',
         data: {
           labels: etiketler,
           datasets: [
             {
+              type: 'line',
+              label: 'S&P 500 (SPX)',
+              data: spxFiyat,
+              yAxisID: 'y2',
+              borderColor: '#4fd1c5',
+              backgroundColor: '#4fd1c5',
+              pointRadius: 0,
+              borderWidth: 1.5,
+              tension: 0.1,
+            },
+            {
+              type: 'bar',
               label: '% 14g RSI > 70 (asiri alim)',
               data: ustunde70,
+              yAxisID: 'y',
               backgroundColor: 'rgba(79,140,224,0.8)',
               borderWidth: 0,
               barPercentage: 1.0,
               categoryPercentage: 1.0,
             },
             {
+              type: 'bar',
               label: '% 14g RSI < 30 (asiri satim)',
               data: altinda30,
+              yAxisID: 'y',
               backgroundColor: 'rgba(224,166,62,0.8)',
               borderWidth: 0,
               barPercentage: 1.0,
@@ -68,6 +85,7 @@
               grid: { color: '#1c2130' },
             },
             y: {
+              position: 'left',
               ticks: {
                 color: '#8a90a2',
                 callback: (v) => Math.abs(v) + '%',
@@ -75,13 +93,25 @@
               grid: {
                 color: (c) => c.tick.value === 0 ? '#4a5164' : '#1c2130',
               },
+              title: { display: true, text: '% RSI asiri alim/satim', color: '#8a90a2' },
+            },
+            y2: {
+              position: 'right',
+              ticks: { color: '#8a90a2' },
+              grid: { display: false },
+              title: { display: true, text: 'SPX fiyat', color: '#8a90a2' },
             },
           },
           plugins: {
             legend: { labels: { color: '#e6e8ee' } },
             tooltip: {
               callbacks: {
-                label: (item) => `${item.dataset.label.replace(/^%.*?\)/, '')}: ${Math.abs(item.parsed.y).toFixed(1)}%`,
+                label: (item) => {
+                  if (item.dataset.yAxisID === 'y2') {
+                    return `${item.dataset.label}: ${item.parsed.y}`;
+                  }
+                  return `${item.dataset.label.replace(/^%.*?\)/, '')}: ${Math.abs(item.parsed.y).toFixed(1)}%`;
+                },
               },
             },
           },

@@ -72,11 +72,14 @@ always-on task olarak `scheduler.py` calisiyor)
     S&P 500 companies" tablosundan aliniyor. 503 hisse icin cekim ~2-3
     dakika suruyor ama neredeyse tamami ag bekleme suresi (CPU degil),
     PythonAnywhere'in CPU-saniye kotasini pratikte zorlamiyor;
-    `daily_at_tr="23:00"` ile gunde 1 kez calisir. Sayfasi
-    `templates/rsi_breadth.html` icinde Bloomberg tarzi bar chart (mavi:
-    >70 yukarida, turuncu: <30 asagida negatif eksende gosteriliyor ama
-    deger her zaman pozitif yuzde), lejanttan acilir/kapanir, tarih araligi
-    kaydiricisi ve genislik/yukseklik girisi var.
+    `daily_at_tr="23:00"` ile gunde 1 kez calisir. Karsilastirma icin S&P 500
+    (SPCFD:SPX) gunluk kapanis fiyati da her zamanki tercih olan
+    TradingView'den (tvDatafeed) cekilip ikinci eksende cizgi olarak
+    ekleniyor. Sayfasi `templates/rsi_breadth.html` icinde dual-axis
+    Bloomberg tarzi grafik (turkuaz: SPX fiyati sag eksen; mavi: >70
+    yukarida, turuncu: <30 asagida negatif eksende gosteriliyor ama deger
+    her zaman pozitif yuzde, sol eksen), hepsi lejanttan acilir/kapanir,
+    tarih araligi kaydiricisi ve genislik/yukseklik girisi var.
 - `static/date-range-slider.js` - grafik kartlarinin altina eklenen, yeniden
   kullanilabilir cift tutamacli tarih araligi kaydiricisi (mini onizleme +
   Chart.js x ekseni zoom).

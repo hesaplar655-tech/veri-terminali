@@ -6,7 +6,9 @@ Bu veri TradingView'de (ne sembol arama API'sinde ne de tahmin edilebilir
 ticker kaliplarinda - S5RH, S5RSI, S5OB vb. hicbiri yok) hazir bir ticker
 olarak bulunamadi; arastirildi ve dogrulandi (bkz. proje sohbet gecmisi).
 Bu yuzden ham veriyi Yahoo Finance'den (hizli, limitsiz, kimlik dogrulama
-gerektirmeyen chart API'si) cekip RSI'i kendimiz hesapliyoruz:
+gerektirmeyen chart API'si) cekip RSI'i kendimiz hesapliyoruz. Karsilastirma
+icin S&P 500 (SPCFD:SPX) fiyati de her zamanki tercih olan TradingView'den
+(tvDatafeed) ekleniyor:
 
 1. S&P 500 uye listesi: Wikipedia "List of S&P 500 companies" tablosu
    (guncel, herkese acik, standart kaynak).
@@ -26,6 +28,7 @@ from datetime import timezone, timedelta
 
 import pandas as pd
 import requests
+from tvDatafeed import TvDatafeed, Interval
 
 TR_TZ = timezone(timedelta(hours=3))
 HEADERS = {
@@ -73,6 +76,16 @@ def _kapanis_serisi(session, sembol):
     return pd.Series(degerler, index=pd.Index(tarihler, name="tarih"))
 
 
+def _spx_kapanis_gunluk():
+    tv = TvDatafeed()
+    df = tv.get_hist(symbol="SPX", exchange="SPCFD", interval=Interval.in_daily, n_bars=600)
+    out = {}
+    for ts, row in df.iterrows():
+        d = ts.tz_localize("UTC").astimezone(TR_TZ).strftime("%Y-%m-%d") if ts.tzinfo is None else ts.astimezone(TR_TZ).strftime("%Y-%m-%d")
+        out[d] = round(float(row["close"]), 2)
+    return out
+
+
 def _rsi(kapanislar: pd.Series) -> pd.Series:
     delta = kapanislar.diff()
     kazanc = delta.clip(lower=0)
@@ -84,6 +97,7 @@ def _rsi(kapanislar: pd.Series) -> pd.Series:
 
 
 def fetch():
+    spx = _spx_kapanis_gunluk()
     semboller = _sp500_semboller()
 
     session = requests.Session()
@@ -111,11 +125,14 @@ def fetch():
             continue
         ustunde_70 = float((gecerli > 70).sum()) / len(gecerli) * 100
         altinda_30 = float((gecerli < 30).sum()) / len(gecerli) * 100
-        events.append({
+        event = {
             "tarih": tarih,
             "ustunde_70_yuzde": round(ustunde_70, 2),
             "altinda_30_yuzde": round(altinda_30, 2),
             "kapsam": int(len(gecerli)),
-        })
+        }
+        if tarih in spx:
+            event["spx_kapanis"] = spx[tarih]
+        events.append(event)
 
     return events
