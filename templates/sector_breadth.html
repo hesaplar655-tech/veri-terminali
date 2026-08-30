@@ -33,6 +33,13 @@
         <div class="sector-modal-canvas-wrap">
           <canvas id="sector-modal-canvas"></canvas>
         </div>
+        <div class="sector-modal-zscore-header">
+          <span class="ts">Z-Score (breadth'in son 6 aylik ortalamaya gore kac standart sapma uzakta oldugu)</span>
+          <span class="zscore-badge" id="zscore-badge">Z +0.00</span>
+        </div>
+        <div class="sector-modal-zscore-wrap">
+          <canvas id="sector-modal-zscore-canvas"></canvas>
+        </div>
         <div id="sector-modal-slider"></div>
       </div>
     </div>
@@ -60,6 +67,28 @@
 
       function genislikVerisi(seri) {
         return seri.map(d => ({ x: new Date(d.tarih).getTime(), y: d.genislik_yuzde }));
+      }
+
+      const ZSCORE_PENCERE = 126; // ~6 ay (21 islem gunu/ay * 6)
+      const ZSCORE_MIN_NOKTA = 20; // yeterli veri olmadan hesaplamayi atla
+
+      function zScoreVerisi(seri) {
+        const degerler = seri.map(d => d.genislik_yuzde);
+        const out = [];
+        for (let i = 0; i < degerler.length; i++) {
+          const bas = Math.max(0, i - ZSCORE_PENCERE + 1);
+          const pencere = degerler.slice(bas, i + 1);
+          if (pencere.length < ZSCORE_MIN_NOKTA) {
+            out.push({ x: new Date(seri[i].tarih).getTime(), y: 0 });
+            continue;
+          }
+          const ort = pencere.reduce((a, b) => a + b, 0) / pencere.length;
+          const varyans = pencere.reduce((a, b) => a + (b - ort) ** 2, 0) / pencere.length;
+          const std = Math.sqrt(varyans);
+          const z = std === 0 ? 0 : (degerler[i] - ort) / std;
+          out.push({ x: new Date(seri[i].tarih).getTime(), y: Math.round(z * 100) / 100 });
+        }
+        return out;
       }
 
       function chartAyarlari(seri, kucukMu) {
@@ -154,7 +183,53 @@
       const modalTitle = document.getElementById('sector-modal-title');
       const modalTickers = document.getElementById('sector-modal-tickers');
       const modalCanvas = document.getElementById('sector-modal-canvas');
+      const zscoreCanvas = document.getElementById('sector-modal-zscore-canvas');
+      const zscoreBadge = document.getElementById('zscore-badge');
       let modalChart = null;
+      let zscoreChart = null;
+
+      function zscoreChartAyarlari(zVeri) {
+        return {
+          type: 'bar',
+          data: {
+            datasets: [{
+              label: 'Z-Score',
+              data: zVeri,
+              backgroundColor: zVeri.map(d => d.y >= 0 ? 'rgba(62,207,110,0.75)' : 'rgba(224,85,79,0.75)'),
+              borderWidth: 0,
+              barPercentage: 1.0,
+              categoryPercentage: 1.0,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            scales: {
+              x: {
+                type: 'time',
+                time: { unit: 'month' },
+                ticks: { display: false },
+                grid: { display: false },
+              },
+              y: {
+                ticks: { color: '#8a90a2', font: { size: 9 } },
+                grid: {
+                  color: (ctx) => ctx.tick.value === 0 ? '#4a5164' : '#1c2130',
+                },
+              },
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (item) => `Z: ${item.parsed.y >= 0 ? '+' : ''}${item.parsed.y.toFixed(2)}`,
+                },
+              },
+            },
+          },
+        };
+      }
 
       function acModal(key) {
         const sektor = veri[key];
@@ -165,13 +240,21 @@
         const ctx = modalCanvas.getContext('2d');
         modalChart = new Chart(ctx, chartAyarlari(sektor.seri, false));
 
+        const zVeri = zScoreVerisi(sektor.seri);
+        if (zscoreChart) zscoreChart.destroy();
+        zscoreChart = new Chart(zscoreCanvas.getContext('2d'), zscoreChartAyarlari(zVeri));
+
+        const sonZ = zVeri[zVeri.length - 1].y;
+        zscoreBadge.textContent = `Z ${sonZ >= 0 ? '+' : ''}${sonZ.toFixed(2)}`;
+        zscoreBadge.classList.toggle('negatif', sonZ < 0);
+
         const tarihler = sektor.seri.map(d => d.tarih);
         const kapanislar = sektor.seri.map(d => d.kapanis);
         createDateRangeSlider({
           container: document.getElementById('sector-modal-slider'),
           dates: tarihler,
           values: kapanislar,
-          chart: null, // ozel: asagida modalChart'i zaman ekseninde guncelliyoruz
+          chart: null, // ozel: asagida modalChart+zscoreChart'i zaman ekseninde guncelliyoruz
         });
         // date-range-slider varsayilan olarak category x eksenini bekliyor;
         // burada time-scale kullandigimiz icin secimi kendimiz uyguluyoruz.
@@ -181,9 +264,14 @@
             const l = parseInt(slider.querySelector('.drs-handle-left').value, 10);
             const r = parseInt(slider.querySelector('.drs-handle-right').value, 10);
             const lo = Math.min(l, r), hi = Math.max(l, r);
-            modalChart.options.scales.x.min = new Date(tarihler[lo]).getTime();
-            modalChart.options.scales.x.max = new Date(tarihler[hi]).getTime();
+            const min = new Date(tarihler[lo]).getTime();
+            const max = new Date(tarihler[hi]).getTime();
+            modalChart.options.scales.x.min = min;
+            modalChart.options.scales.x.max = max;
             modalChart.update('none');
+            zscoreChart.options.scales.x.min = min;
+            zscoreChart.options.scales.x.max = max;
+            zscoreChart.update('none');
           });
         });
 
