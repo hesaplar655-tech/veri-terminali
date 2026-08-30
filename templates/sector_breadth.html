@@ -12,6 +12,13 @@
       tiklayinca buyutulmus halini gorursunuz.
     </p>
 
+    <div class="chart-controls">
+      <label>Genislik (MA) cizgisi opakligi:
+        <input type="range" id="ma-opaklik" min="0" max="100" value="100" step="1">
+        <span id="ma-opaklik-deger">100%</span>
+      </label>
+    </div>
+
     <div class="sector-grid" id="sector-grid"></div>
 
     <div class="sector-modal-overlay" id="sector-modal-overlay">
@@ -38,6 +45,11 @@
     <script>
       const veri = {{ record.veri | tojson }};  // { key: { title, fiyat_ticker, genislik_ticker, seri: [...] } }
       const sektorAnahtarlari = Object.keys(veri);
+
+      let genislikOpaklik = 1;
+      function genislikRengi() {
+        return `rgba(79, 209, 197, ${genislikOpaklik})`;
+      }
 
       function mumVerisi(seri) {
         return seri.map(d => ({
@@ -67,8 +79,8 @@
                 label: '% 20g MA uzerinde',
                 data: genislikVerisi(seri),
                 yAxisID: 'y1',
-                borderColor: '#4fd1c5',
-                backgroundColor: '#4fd1c5',
+                borderColor: genislikRengi(),
+                backgroundColor: genislikRengi(),
                 pointRadius: 0,
                 borderWidth: 1.25,
                 tension: 0.1,
@@ -188,6 +200,32 @@
       });
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') kapatModal();
+      });
+
+      // --- MA (genislik) cizgisi opakligi ---
+      const opaklikInput = document.getElementById('ma-opaklik');
+      const opaklikDeger = document.getElementById('ma-opaklik-deger');
+
+      function tumGrafiklerdeOpaklikGuncelle() {
+        const renk = genislikRengi();
+        Object.values(kucukChartlar).forEach((chart) => {
+          const ds = chart.data.datasets[1];
+          ds.borderColor = renk;
+          ds.backgroundColor = renk;
+          chart.update('none');
+        });
+        if (modalChart) {
+          const ds = modalChart.data.datasets[1];
+          ds.borderColor = renk;
+          ds.backgroundColor = renk;
+          modalChart.update('none');
+        }
+      }
+
+      opaklikInput.addEventListener('input', (e) => {
+        genislikOpaklik = parseInt(e.target.value, 10) / 100;
+        opaklikDeger.textContent = e.target.value + '%';
+        tumGrafiklerdeOpaklikGuncelle();
       });
     </script>
   {% else %}
