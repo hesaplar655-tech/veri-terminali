@@ -17,6 +17,7 @@
     <div class="chart-wrap" id="chart-wrap">
       <canvas id="chart"></canvas>
     </div>
+    <div id="date-range-slider"></div>
     <p class="ts">
       Turkuaz cizgi: S&amp;P 500 (SPCFD:SPX) kapanis fiyati (sol eksen).
       Mavi cubuklar: S5TH - S&amp;P 500 hisselerinin 200 gunluk ortalamasinin
@@ -26,6 +27,7 @@
       kapatabilirsiniz. Veri 2019 basindan itibaren gosteriliyor.
     </p>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="{{ url_for('static', filename='date-range-slider.js') }}"></script>
     <script>
       const veri = {{ record.veri | tojson }};
       const etiketler = veri.map(d => d.tarih);
@@ -88,6 +90,13 @@
             },
           },
         },
+      });
+
+      createDateRangeSlider({
+        container: document.getElementById('date-range-slider'),
+        dates: etiketler,
+        values: spxFiyat,
+        chart: chart,
       });
 
       // Kullanicinin girdigi genislik/yukseklige gore grafik boyutu

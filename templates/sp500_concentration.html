@@ -18,6 +18,7 @@
     <div class="chart-wrap" id="chart-wrap">
       <canvas id="chart"></canvas>
     </div>
+    <div id="date-range-slider"></div>
     <p class="ts">
       Turkuaz cizgi: S&amp;P 500 (SPY, piyasa degeri agirlikli) kapanis fiyati (sol eksen).
       Cubuklar: 3M Excess Return = SPW (S&amp;P 500 Esit Agirlikli, RSP) 3 aylik getirisi
@@ -28,6 +29,7 @@
       Lejanttaki ogelere tiklayarak acip kapatabilirsiniz.
     </p>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="{{ url_for('static', filename='date-range-slider.js') }}"></script>
     <script>
       const veri = {{ record.veri | tojson }};
       const etiketler = veri.map(d => d.tarih);
@@ -44,6 +46,9 @@
           const xScale = scales.x;
           const maxAbs = Math.max(...ma200Yuzde.map(v => Math.abs(v)), 1);
           ctx.save();
+          ctx.beginPath();
+          ctx.rect(chartArea.left, chartArea.top, chartArea.width, chartArea.height);
+          ctx.clip();
           for (let i = 0; i < ma200Yuzde.length; i++) {
             const v = ma200Yuzde[i];
             const intensity = Math.min(Math.abs(v) / maxAbs, 1);
@@ -126,6 +131,13 @@
         plugins: [golgePlugin],
       });
       chart.$golgeAcik = true;
+
+      createDateRangeSlider({
+        container: document.getElementById('date-range-slider'),
+        dates: etiketler,
+        values: spyFiyat,
+        chart: chart,
+      });
 
       document.getElementById('toggle-shading').addEventListener('change', (e) => {
         chart.$golgeAcik = e.target.checked;
