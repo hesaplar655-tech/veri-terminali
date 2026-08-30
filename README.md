@@ -51,7 +51,16 @@ always-on task olarak `scheduler.py` calisiyor)
     edildi ve tvDatafeed ile dogrulandi. Sayfasi `templates/sector_breadth.html`
     icinde 12 kartlik bir izgara (chartjs-chart-financial ile gercek mum
     grafik + breadth cizgisi, ikisi de lejanttan acilir/kapanir); bir karta
-    tiklayinca buyutulmus, kendi tarih araligi kaydiricili bir modalda acilir.
+    tiklayinca buyutulmus, kendi tarih araligi kaydiricili bir modalda acilir;
+    Z-Score paneli (breadth'in son 6 aylik ortalamaya gore kac std sapma
+    uzakta oldugu) da bu modalin altinda.
+  - `index_breadth.py` - S&P 500, Nasdaq Composite ve Russell 2000 icin "%
+    uyeler 50/200 gunluk ortalamanin uzerinde" (INDEX:S5FI/S5TH,
+    INDEX:NCFI/NCTH, INDEX:R2FI/R2TH). S&P 500 disindaki ticker'lar da
+    TradingView'in sembol arama API'sinden bulunup tvDatafeed ile
+    dogrulandi. Sayfasi `templates/index_breadth.html` icinde iki ust uste
+    grafik (50g, 200g), uc endeks de lejanttan acilir/kapanir, tek bir
+    kaydirici ikisini birden zoomlar.
 - `static/date-range-slider.js` - grafik kartlarinin altina eklenen, yeniden
   kullanilabilir cift tutamacli tarih araligi kaydiricisi (mini onizleme +
   Chart.js x ekseni zoom).

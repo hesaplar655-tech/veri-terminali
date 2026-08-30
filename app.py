@@ -67,6 +67,7 @@ CUSTOM_TEMPLATES = {
     "sp500_breadth": "sp500_breadth.html",
     "market_relative": "market_relative.html",
     "sector_breadth": "sector_breadth.html",
+    "index_breadth": "index_breadth.html",
 }
 
 

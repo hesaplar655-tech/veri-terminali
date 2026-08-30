@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}{{ source.title }} - Veri Terminali{% endblock %}
+{% block content %}
+  <p><a href="{{ url_for('panel') }}">&larr; panel</a></p>
+  <h1>{{ source.title }}</h1>
+  {% if record %}
+    <p class="ts">son guncelleme: {{ record.guncellenme_zamani }} (TR saatiyle her gun 23:00'te)</p>
+
+    <div class="chart-controls">
+      <span class="size-controls">
+        <label>Genislik (px): <input type="number" id="chart-width" min="200" max="4000" step="10" placeholder="otomatik"></label>
+        <label>Yukseklik (px, her grafik icin): <input type="number" id="chart-height" min="120" max="1500" step="10" placeholder="otomatik"></label>
+        <button type="button" id="apply-size" class="btn-sm">Uygula</button>
+        <button type="button" id="reset-size" class="btn-sm btn-sm-ghost">Sifirla</button>
+      </span>
+    </div>
+
+    <h2>% Uyeler 50 Gunluk Ortalamanin Uzerinde</h2>
+    <div class="chart-wrap" id="chart-wrap-50">
+      <canvas id="chart-50"></canvas>
+    </div>
+
+    <h2>% Uyeler 200 Gunluk Ortalamanin Uzerinde</h2>
+    <div class="chart-wrap" id="chart-wrap-200">
+      <canvas id="chart-200"></canvas>
+    </div>
+
+    <div id="date-range-slider"></div>
+    <p class="ts">
+      S&amp;P 500 (INDEX:S5FI / S5TH), Nasdaq Composite (INDEX:NCFI / NCTH),
+      Russell 2000 (INDEX:R2FI / R2TH). Lejanttaki ogelere tiklayarak
+      acip kapatabilirsiniz. Kaydirici her iki grafigi de ayni anda zoomlar.
+    </p>
+
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
+    <script src="{{ url_for('static', filename='date-range-slider.js') }}"></script>
+    <script>
+      const veri = {{ record.veri | tojson }};  // { "50g": [...], "200g": [...] }
+
+      function grafikOlustur(canvasId, seri, baslik) {
+        const etiketler = seri.map(d => d.tarih);
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        return new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: etiketler,
+            datasets: [
+              {
+                label: 'S&P 500',
+                data: seri.map(d => d.spx),
+                borderColor: '#4f8ce0',
+                backgroundColor: '#4f8ce0',
+                pointRadius: 0,
+                borderWidth: 1.25,
+                tension: 0.1,
+              },
+              {
+                label: 'Nasdaq Composite',
+                data: seri.map(d => d.nasdaq),
+                borderColor: '#e0a63e',
+                backgroundColor: '#e0a63e',
+                pointRadius: 0,
+                borderWidth: 1.25,
+                tension: 0.1,
+              },
+              {
+                label: 'Russell 2000',
+                data: seri.map(d => d.russell),
+                borderColor: '#e6e8ee',
+                backgroundColor: '#e6e8ee',
+                pointRadius: 0,
+                borderWidth: 1.25,
+                tension: 0.1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+              x: {
+                ticks: { color: '#8a90a2', maxTicksLimit: 12 },
+                grid: { color: '#1c2130' },
+              },
+              y: {
+                min: 0,
+                max: 100,
+                ticks: { color: '#8a90a2', callback: (v) => v + '%' },
+                grid: { color: '#1c2130' },
+                title: { display: true, text: baslik, color: '#8a90a2' },
+              },
+            },
+            plugins: {
+              legend: { labels: { color: '#e6e8ee' } },
+              tooltip: {
+                callbacks: {
+                  label: (item) => `${item.dataset.label}: ${item.parsed.y.toFixed(1)}%`,
+                },
+              },
+            },
+          },
+        });
+      }
+
+      const chart50 = grafikOlustur('chart-50', veri['50g'], '% 50g MA uzerinde');
+      const chart200 = grafikOlustur('chart-200', veri['200g'], '% 200g MA uzerinde');
+
+      // --- tarih araligi kaydiricisi: her iki grafigi de ayni anda zoomlar ---
+      const etiketler50 = veri['50g'].map(d => d.tarih);
+      const etiketler200 = veri['200g'].map(d => d.tarih);
+      createDateRangeSlider({
+        container: document.getElementById('date-range-slider'),
+        dates: etiketler50,
+        values: veri['50g'].map(d => d.spx),
+        chart: chart50,
+      });
+      const slider = document.getElementById('date-range-slider');
+      slider.querySelectorAll('.drs-handle').forEach((handle) => {
+        handle.addEventListener('input', () => {
+          const l = parseInt(slider.querySelector('.drs-handle-left').value, 10);
+          const r = parseInt(slider.querySelector('.drs-handle-right').value, 10);
+          const lo = Math.min(l, r), hi = Math.max(l, r);
+          // 200g serisi farkli uzunlukta olabilir; en yakin ortak tarih araligini kullan
+          chart200.options.scales.x.min = etiketler50[lo];
+          chart200.options.scales.x.max = etiketler50[hi];
+          chart200.update('none');
+        });
+      });
+
+      // --- genislik/yukseklik kontrolu (her iki grafik icin birlikte) ---
+      const wrap50 = document.getElementById('chart-wrap-50');
+      const wrap200 = document.getElementById('chart-wrap-200');
+      const widthInput = document.getElementById('chart-width');
+      const heightInput = document.getElementById('chart-height');
+      const STORAGE_KEY = 'index_breadth_size';
+
+      function applySize(width, height) {
+        [wrap50, wrap200].forEach((wrap) => {
+          wrap.style.width = width ? width + 'px' : '';
+          wrap.style.height = height ? height + 'px' : '';
+          wrap.style.maxWidth = width ? 'none' : '';
+          wrap.style.maxHeight = height ? 'none' : '';
+        });
+        chart50.resize();
+        chart200.resize();
+      }
+
+      function saveSize(width, height) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ width, height }));
+        } catch (e) { /* localStorage yoksa sessizce gec */ }
+      }
+
+      document.getElementById('apply-size').addEventListener('click', () => {
+        const width = parseInt(widthInput.value, 10) || null;
+        const height = parseInt(heightInput.value, 10) || null;
+        applySize(width, height);
+        saveSize(width, height);
+      });
+
+      document.getElementById('reset-size').addEventListener('click', () => {
+        widthInput.value = '';
+        heightInput.value = '';
+        applySize(null, null);
+        saveSize(null, null);
+      });
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if (saved && (saved.width || saved.height)) {
+          if (saved.width) widthInput.value = saved.width;
+          if (saved.height) heightInput.value = saved.height;
+          applySize(saved.width, saved.height);
+        }
+      } catch (e) { /* localStorage yoksa sessizce gec */ }
+    </script>
+  {% else %}
+    <p class="ts">Bu sayfa icin henuz veri cekilmedi. Scheduler calistiginda burasi dolacak (TR saatiyle her gun 23:00).</p>
+  {% endif %}
+{% endblock %}
