@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}{{ source.title }} - Veri Terminali{% endblock %}
+{% block content %}
+  <p><a href="{{ url_for('panel') }}">&larr; panel</a></p>
+  <h1>{{ source.title }}</h1>
+  {% if record %}
+    <p class="ts">son guncelleme: {{ record.guncellenme_zamani }} (TR saatiyle her gun 23:00'te)</p>
+
+    <div class="chart-controls">
+      <label><input type="checkbox" id="toggle-shading" checked> arka plan golgelendirme (200 gunluk ortalamaya gore)</label>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="chart" height="420"></canvas>
+    </div>
+    <p class="ts">
+      Mavi cizgi: S&amp;P 500 (SPY) kapanis fiyati (sol eksen).
+      Cubuklar: SPY ile MAGS (Magnificent 7 ETF) arasindaki 3 aylik getiri farki, yuzde puan (sag eksen).
+      Arka plan: SPY'nin 200 gunluk ortalamasinin ne kadar uzerinde/altinda oldugu (yesil = uzerinde, kirmizi = altinda).
+      Lejanttaki ogelere tiklayarak acip kapatabilirsiniz.
+    </p>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script>
+      const veri = {{ record.veri | tojson }};
+      const etiketler = veri.map(d => d.tarih);
+      const spyFiyat = veri.map(d => d.spy_kapanis);
+      const fark3ay = veri.map(d => d["3ay_fark_yuzde"]);
+      const ma200Yuzde = veri.map(d => d.ma200_uzerinde_yuzde);
+
+      const golgePlugin = {
+        id: 'golgePlugin',
+        beforeDatasetsDraw(chart) {
+          if (!chart.$golgeAcik) return;
+          const { ctx, chartArea, scales } = chart;
+          if (!chartArea) return;
+          const xScale = scales.x;
+          const maxAbs = Math.max(...ma200Yuzde.map(v => Math.abs(v)), 1);
+          ctx.save();
+          for (let i = 0; i < ma200Yuzde.length; i++) {
+            const v = ma200Yuzde[i];
+            const intensity = Math.min(Math.abs(v) / maxAbs, 1);
+            const hue = v >= 0 ? 140 : 0;
+            ctx.fillStyle = `hsla(${hue}, 70%, 50%, ${0.06 + intensity * 0.22})`;
+            const xCenter = xScale.getPixelForValue(i);
+            const xNext = i < ma200Yuzde.length - 1 ? xScale.getPixelForValue(i + 1) : xCenter + (xCenter - xScale.getPixelForValue(i - 1));
+            const xPrev = i > 0 ? xScale.getPixelForValue(i - 1) : xCenter - (xScale.getPixelForValue(i + 1) - xCenter);
+            const left = (xPrev + xCenter) / 2;
+            const right = (xNext + xCenter) / 2;
+            ctx.fillRect(left, chartArea.top, right - left, chartArea.bottom - chartArea.top);
+          }
+          ctx.restore();
+        }
+      };
+
+      const ctx = document.getElementById('chart').getContext('2d');
+      const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: etiketler,
+          datasets: [
+            {
+              type: 'line',
+              label: 'S&P 500 (SPY)',
+              data: spyFiyat,
+              yAxisID: 'y',
+              borderColor: '#4fd1c5',
+              backgroundColor: '#4fd1c5',
+              pointRadius: 0,
+              borderWidth: 1.5,
+              tension: 0.1,
+            },
+            {
+              type: 'bar',
+              label: '3 Aylik Fark (SPY - MAGS), yuzde puan',
+              data: fark3ay,
+              yAxisID: 'y1',
+              backgroundColor: fark3ay.map(v => v >= 0 ? 'rgba(224,85,79,0.7)' : 'rgba(224,85,79,0.7)'),
+              borderWidth: 0,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: {
+              ticks: { color: '#8a90a2', maxTicksLimit: 12 },
+              grid: { color: '#1c2130' },
+            },
+            y: {
+              position: 'left',
+              ticks: { color: '#8a90a2' },
+              grid: { color: '#1c2130' },
+              title: { display: true, text: 'SPY fiyat ($)', color: '#8a90a2' },
+            },
+            y1: {
+              position: 'right',
+              ticks: { color: '#8a90a2' },
+              grid: { display: false },
+              title: { display: true, text: '3 aylik fark (%)', color: '#8a90a2' },
+            },
+          },
+          plugins: {
+            legend: {
+              labels: { color: '#e6e8ee' },
+            },
+            tooltip: {
+              callbacks: {
+                afterBody(items) {
+                  const i = items[0].dataIndex;
+                  return `200g ort. uzerinde: ${ma200Yuzde[i].toFixed(1)}%`;
+                }
+              }
+            }
+          },
+        },
+        plugins: [golgePlugin],
+      });
+      chart.$golgeAcik = true;
+
+      document.getElementById('toggle-shading').addEventListener('change', (e) => {
+        chart.$golgeAcik = e.target.checked;
+        chart.draw();
+      });
+    </script>
+  {% else %}
+    <p class="ts">Bu sayfa icin henuz veri cekilmedi. Scheduler calistiginda burasi dolacak (TR saatiyle her gun 23:00).</p>
+  {% endif %}
+{% endblock %}

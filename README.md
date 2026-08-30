@@ -1,5 +1,9 @@
 # Veri Terminali
 
+**Canli site:** https://efe111.pythonanywhere.com/ (PythonAnywhere Developer plan,
+always-on task olarak `scheduler.py` calisiyor)
+**Kod:** https://github.com/hesaplar655-tech/veri-terminali
+
 ## Yapi
 - `sources/` - her veri kaynagi icin bir dosya + `fetch()` fonksiyonu. `sources/__init__.py`
   icindeki `SOURCES` listesine kaydedilir (baslik, frekans).
@@ -13,6 +17,17 @@
     araligini, Turkiye dahil tum ulkeler icin forecast+actual+previous ile
     donduruyor. Tum olay adlari Ingilizce (Turkiye dahil - ceviri yapilmiyor,
     kullanicinin tercihiyle).
+  - `sp500_concentration.py` - AMEX:SPY ve CBOE:MAGS icin TradingView'den
+    (`tvDatafeed` kutuphanesi, TradingView'in grafik websocket protokolu,
+    kimlik dogrulama gerekmeden) gunluk kapanis fiyati ceker; SPY'nin 200
+    gunluk ortalamaya gore konumunu ve SPY-MAGS arasindaki 3 aylik getiri
+    farkini hesaplar. CBOE:MAGS 2023 Nisan'da islem gormeye basladigi ve
+    nologin erisim ~Kasim 2023'ten itibaren veri verdigi icin grafik daha
+    eskiye gidemiyor - kaynagin dogal siniri. `daily_at_tr="23:00"` ile
+    Turkiye saatiyle gunde 1 kez calisir. Sayfasi
+    `templates/sp500_concentration.html` icinde Chart.js ile ozel bir dual-axis
+    grafik (fiyat + 3 aylik fark, 200g ortalamaya gore arka plan golgelendirme,
+    lejanttan acilir/kapanir).
 - `storage.py` - veriyi `data/<key>.json` olarak yazar/okur.
 - `scheduler.py` - surekli calisan process; her kaynagi kendi frekansinda tetikler.
   PythonAnywhere'de bir **Always-on task** olarak calistirilir.
@@ -35,10 +50,23 @@
 
 ## Yeni bir sayfa/veri kaynagi eklemek
 1. `sources/<isim>.py` olustur, icine bir `fetch()` fonksiyonu yaz (dict/list donsun).
-2. `sources/__init__.py` -> `SOURCES` listesine bir `Source(...)` satiri ekle
-   (key, title, fetch, interval_unit, interval_value).
-3. Gerekirse `templates/page.html`'i o veri icin ozellestir (su an ham JSON basiyor).
+2. `sources/__init__.py` -> `SOURCES` listesine bir `Source(...)` satiri ekle:
+   - duzenli aralik icin `interval_unit` + `interval_value`, VEYA
+   - TR saatiyle gunde 1 kez icin `daily_at_tr="HH:MM"`.
+3. Gerekirse `templates/page.html`'i o veri icin ozellestir (varsayilan ham JSON
+   basar), ya da ozel bir sayfa istiyorsan yeni bir template yazip `app.py`
+   icindeki `CUSTOM_TEMPLATES` sozlugune `key: "template.html"` ekle.
 4. `python scheduler.py` calistirinca yeni kaynak da otomatik islenir.
+
+## Canli siteyi guncellemek (PythonAnywhere)
+```bash
+# PythonAnywhere Bash konsolunda:
+cd ~/veri-terminali
+git pull
+venv/bin/pip install -r requirements.txt   # yeni bagimlilik eklendiyse
+```
+Sonra **Web** sekmesinden **Reload**, **Tasks** sekmesinden always-on task'i
+**Restart** et (kod veya zamanlama degistiyse).
 
 ## Yerelde calistirma
 ```bash

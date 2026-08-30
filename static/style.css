@@ -129,6 +129,19 @@ table th {
 .gerceklesen-yukari { color: #3ecf6e; font-weight: 700; }
 .gerceklesen-asagi { color: #e0554f; font-weight: 700; }
 
+.chart-controls {
+  margin-bottom: 1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.chart-wrap {
+  background: var(--panel);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
 .devam-et-wrap {
   margin-top: 2rem;
   text-align: center;

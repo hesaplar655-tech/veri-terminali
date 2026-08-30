@@ -62,13 +62,19 @@ def panel():
     return render_template("panel.html", pages=pages)
 
 
+CUSTOM_TEMPLATES = {
+    "sp500_concentration": "sp500_concentration.html",
+}
+
+
 @app.route("/sayfa/<key>")
 def page(key):
     source = SOURCES_BY_KEY.get(key)
     if source is None:
         abort(404)
     record = storage.load(key)
-    return render_template("page.html", source=source, record=record)
+    template = CUSTOM_TEMPLATES.get(key, "page.html")
+    return render_template(template, source=source, record=record)
 
 
 if __name__ == "__main__":
