@@ -19,17 +19,18 @@
     <div class="chart-wrap" id="chart-wrap-50">
       <canvas id="chart-50"></canvas>
     </div>
+    <div id="date-range-slider-50"></div>
 
     <h2>% Uyeler 200 Gunluk Ortalamanin Uzerinde</h2>
     <div class="chart-wrap" id="chart-wrap-200">
       <canvas id="chart-200"></canvas>
     </div>
+    <div id="date-range-slider-200"></div>
 
-    <div id="date-range-slider"></div>
     <p class="ts">
       S&amp;P 500 (INDEX:S5FI / S5TH), Nasdaq Composite (INDEX:NCFI / NCTH),
       Russell 2000 (INDEX:R2FI / R2TH). Lejanttaki ogelere tiklayarak
-      acip kapatabilirsiniz. Kaydirici her iki grafigi de ayni anda zoomlar.
+      acip kapatabilirsiniz. Her grafigin kendi tarih araligi kaydiricisi var.
     </p>
 
     <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
@@ -108,26 +109,18 @@
       const chart50 = grafikOlustur('chart-50', veri['50g'], '% 50g MA uzerinde');
       const chart200 = grafikOlustur('chart-200', veri['200g'], '% 200g MA uzerinde');
 
-      // --- tarih araligi kaydiricisi: her iki grafigi de ayni anda zoomlar ---
-      const etiketler50 = veri['50g'].map(d => d.tarih);
-      const etiketler200 = veri['200g'].map(d => d.tarih);
+      // --- her grafigin kendi bagimsiz tarih araligi kaydiricisi ---
       createDateRangeSlider({
-        container: document.getElementById('date-range-slider'),
-        dates: etiketler50,
+        container: document.getElementById('date-range-slider-50'),
+        dates: veri['50g'].map(d => d.tarih),
         values: veri['50g'].map(d => d.spx),
         chart: chart50,
       });
-      const slider = document.getElementById('date-range-slider');
-      slider.querySelectorAll('.drs-handle').forEach((handle) => {
-        handle.addEventListener('input', () => {
-          const l = parseInt(slider.querySelector('.drs-handle-left').value, 10);
-          const r = parseInt(slider.querySelector('.drs-handle-right').value, 10);
-          const lo = Math.min(l, r), hi = Math.max(l, r);
-          // 200g serisi farkli uzunlukta olabilir; en yakin ortak tarih araligini kullan
-          chart200.options.scales.x.min = etiketler50[lo];
-          chart200.options.scales.x.max = etiketler50[hi];
-          chart200.update('none');
-        });
+      createDateRangeSlider({
+        container: document.getElementById('date-range-slider-200'),
+        dates: veri['200g'].map(d => d.tarih),
+        values: veri['200g'].map(d => d.spx),
+        chart: chart200,
       });
 
       // --- genislik/yukseklik kontrolu (her iki grafik icin birlikte) ---
