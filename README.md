@@ -34,6 +34,16 @@ always-on task olarak `scheduler.py` calisiyor)
     "23:00"`. Sayfasi `templates/sp500_breadth.html` icinde dual-axis grafik
     (fiyat cizgisi + breadth bar chart), lejanttan acilir/kapanir, genislik/
     yukseklik girisiyle boyutu ayarlanabilir.
+  - `market_relative.py` - SPCFD:SPX, CFI:US100 (Nasdaq) ve AMEX:RSP (S&P 500
+    Esit Agirlikli) icin saatlik veri ceker (`interval_unit="hours"`), her
+    birini kendi o ana kadarki zirvesine gore % geri cekilme (rolling
+    drawdown) olarak normalize eder. CFI:US100'un nologin saatlik gecmisi en
+    kisa olani (~Ocak 2025) - ortak baslangic noktasi buna gore. Sayfasi
+    `templates/market_relative.html` icinde uc cizgili (tek eksen) grafik,
+    hepsi lejanttan acilir/kapanir.
+- `static/date-range-slider.js` - grafik kartlarinin altina eklenen, yeniden
+  kullanilabilir cift tutamacli tarih araligi kaydiricisi (mini onizleme +
+  Chart.js x ekseni zoom).
 - `storage.py` - veriyi `data/<key>.json` olarak yazar/okur.
 - `scheduler.py` - surekli calisan process; her kaynagi kendi frekansinda tetikler.
   PythonAnywhere'de bir **Always-on task** olarak calistirilir.

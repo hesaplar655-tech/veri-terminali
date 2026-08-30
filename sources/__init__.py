@@ -15,7 +15,7 @@ Zamanlama iki sekilde tanimlanabilir (birini kullan):
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from sources import ornek, ekonomik_takvim, sp500_concentration, sp500_breadth
+from sources import ornek, ekonomik_takvim, sp500_concentration, sp500_breadth, market_relative
 
 
 @dataclass
@@ -47,6 +47,13 @@ SOURCES: list[Source] = [
         title="S&P 500 Genislik (% 200g MA Uzeri)",
         fetch=sp500_breadth.fetch,
         daily_at_tr="23:00",
+    ),
+    Source(
+        key="market_relative",
+        title="Zirveden Geri Cekilme: S&P 500 / Nasdaq / RSP",
+        fetch=market_relative.fetch,
+        interval_unit="hours",
+        interval_value=1,
     ),
     Source(
         key="ornek",
