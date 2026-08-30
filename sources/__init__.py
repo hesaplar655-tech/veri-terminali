@@ -15,7 +15,7 @@ Zamanlama iki sekilde tanimlanabilir (birini kullan):
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from sources import ornek, ekonomik_takvim, sp500_concentration, sp500_breadth, market_relative
+from sources import ornek, ekonomik_takvim, sp500_concentration, sp500_breadth, market_relative, sector_breadth
 
 
 @dataclass
@@ -54,6 +54,12 @@ SOURCES: list[Source] = [
         fetch=market_relative.fetch,
         interval_unit="hours",
         interval_value=1,
+    ),
+    Source(
+        key="sector_breadth",
+        title="Sektor Genislikleri (% 20g MA Uzeri)",
+        fetch=sector_breadth.fetch,
+        daily_at_tr="23:00",
     ),
     Source(
         key="ornek",

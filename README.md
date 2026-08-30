@@ -41,6 +41,17 @@ always-on task olarak `scheduler.py` calisiyor)
     kisa olani (~Ocak 2025) - ortak baslangic noktasi buna gore. Sayfasi
     `templates/market_relative.html` icinde uc cizgili (tek eksen) grafik,
     hepsi lejanttan acilir/kapanir.
+  - `sector_breadth.py` - S&P 500 + 11 GICS sektor ETF'i (AMEX:XLY, XLP, XLE,
+    XLF, XLV, XLI, XLK, XLB, XLRE, XLC, XLU) icin gunluk mum verisi + o
+    sektordeki hisselerin % kaci 20 gunluk ortalamanin uzerinde (breadth).
+    Breadth ticker'lari (INDEX:SYTW, SPTW, SETW, SFTW, SVTW, SITW, SKTW,
+    SBTW, SSTW, SLTW, SUTW, S&P 500 icin S5TW) TradingView'in kendi sembol
+    arama API'sinden (symbol-search.tradingview.com, Barchart kaynakli)
+    bulundu - resmi/belgelenmis degil, sembol arama sonuclarindan tespit
+    edildi ve tvDatafeed ile dogrulandi. Sayfasi `templates/sector_breadth.html`
+    icinde 12 kartlik bir izgara (chartjs-chart-financial ile gercek mum
+    grafik + breadth cizgisi, ikisi de lejanttan acilir/kapanir); bir karta
+    tiklayinca buyutulmus, kendi tarih araligi kaydiricili bir modalda acilir.
 - `static/date-range-slider.js` - grafik kartlarinin altina eklenen, yeniden
   kullanilabilir cift tutamacli tarih araligi kaydiricisi (mini onizleme +
   Chart.js x ekseni zoom).

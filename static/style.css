@@ -267,6 +267,97 @@ table th {
   font-size: 0.85rem;
 }
 
+/* Sektor genislikleri: kart izgarasi + buyutme modali */
+.sector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.sector-tile {
+  background: var(--panel);
+  border: 1px solid #232838;
+  border-radius: 8px;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.sector-tile:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.sector-tile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.4rem;
+}
+
+.sector-tile-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.sector-tile-value {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.sector-tile-canvas-wrap {
+  height: 180px;
+}
+
+.sector-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.sector-modal-overlay.acik {
+  display: flex;
+}
+
+.sector-modal {
+  background: var(--panel);
+  border-radius: 10px;
+  padding: 1.25rem;
+  width: 100%;
+  max-width: 1100px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.sector-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.sector-modal-close {
+  background: transparent;
+  border: 1px solid #232838;
+  color: var(--muted);
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.sector-modal-canvas-wrap {
+  height: 60vh;
+  min-height: 320px;
+}
+
 .devam-et-wrap {
   margin-top: 2rem;
   text-align: center;

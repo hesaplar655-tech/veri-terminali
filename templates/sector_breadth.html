@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block title %}{{ source.title }} - Veri Terminali{% endblock %}
+{% block content %}
+  <p><a href="{{ url_for('panel') }}">&larr; panel</a></p>
+  <h1>{{ source.title }}</h1>
+  {% if record %}
+    <p class="ts">son guncelleme: {{ record.guncellenme_zamani }} (TR saatiyle her gun 23:00'te)</p>
+    <p class="ts">
+      Her kart: mum grafik (fiyat, sol eksen) + turkuaz cizgi (o sektordeki
+      hisselerin 20 gunluk ortalamanin uzerinde olan yuzdesi, sag eksen,
+      0-100). Lejanttaki ogelere tiklayarak acip kapatabilirsiniz. Bir karta
+      tiklayinca buyutulmus halini gorursunuz.
+    </p>
+
+    <div class="sector-grid" id="sector-grid"></div>
+
+    <div class="sector-modal-overlay" id="sector-modal-overlay">
+      <div class="sector-modal">
+        <div class="sector-modal-header">
+          <div>
+            <strong id="sector-modal-title"></strong>
+            <span class="ts" id="sector-modal-tickers"></span>
+          </div>
+          <button type="button" class="sector-modal-close" id="sector-modal-close">Kapat &times;</button>
+        </div>
+        <div class="sector-modal-canvas-wrap">
+          <canvas id="sector-modal-canvas"></canvas>
+        </div>
+        <div id="sector-modal-slider"></div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.2.1/dist/chartjs-chart-financial.min.js"></script>
+    <script src="{{ url_for('static', filename='date-range-slider.js') }}"></script>
+    <script>
+      const veri = {{ record.veri | tojson }};  // { key: { title, fiyat_ticker, genislik_ticker, seri: [...] } }
+      const sektorAnahtarlari = Object.keys(veri);
+
+      function mumVerisi(seri) {
+        return seri.map(d => ({
+          x: new Date(d.tarih).getTime(),
+          o: d.acilis, h: d.yuksek, l: d.dusuk, c: d.kapanis,
+        }));
+      }
+
+      function genislikVerisi(seri) {
+        return seri.map(d => ({ x: new Date(d.tarih).getTime(), y: d.genislik_yuzde }));
+      }
+
+      function chartAyarlari(seri, kucukMu) {
+        return {
+          type: 'candlestick',
+          data: {
+            datasets: [
+              {
+                label: 'Fiyat',
+                data: mumVerisi(seri),
+                yAxisID: 'y',
+                color: { up: '#3ecf6e', down: '#e0554f', unchanged: '#8a90a2' },
+                borderColor: { up: '#3ecf6e', down: '#e0554f', unchanged: '#8a90a2' },
+              },
+              {
+                type: 'line',
+                label: '% 20g MA uzerinde',
+                data: genislikVerisi(seri),
+                yAxisID: 'y1',
+                borderColor: '#4fd1c5',
+                backgroundColor: '#4fd1c5',
+                pointRadius: 0,
+                borderWidth: 1.25,
+                tension: 0.1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+              x: {
+                type: 'time',
+                time: { unit: kucukMu ? 'month' : 'month' },
+                ticks: { color: '#8a90a2', maxTicksLimit: kucukMu ? 4 : 12, font: { size: kucukMu ? 9 : 11 } },
+                grid: { color: '#1c2130' },
+              },
+              y: {
+                position: 'left',
+                ticks: { color: '#8a90a2', font: { size: kucukMu ? 9 : 11 } },
+                grid: { color: '#1c2130' },
+                display: !kucukMu,
+              },
+              y1: {
+                position: 'right',
+                min: 0,
+                max: 100,
+                ticks: { color: '#8a90a2', font: { size: kucukMu ? 9 : 11 } },
+                grid: { display: false },
+                display: !kucukMu,
+              },
+            },
+            plugins: {
+              legend: {
+                display: !kucukMu,
+                labels: { color: '#e6e8ee' },
+              },
+              tooltip: { enabled: !kucukMu },
+            },
+          },
+        };
+      }
+
+      // --- kucuk kartlar ---
+      const grid = document.getElementById('sector-grid');
+      const kucukChartlar = {};
+
+      sektorAnahtarlari.forEach((key) => {
+        const sektor = veri[key];
+        const son = sektor.seri[sektor.seri.length - 1];
+
+        const tile = document.createElement('div');
+        tile.className = 'sector-tile';
+        tile.innerHTML = `
+          <div class="sector-tile-header">
+            <span class="sector-tile-title">${sektor.title}</span>
+            <span class="sector-tile-value">${son.kapanis} | ${son.genislik_yuzde}%</span>
+          </div>
+          <div class="sector-tile-canvas-wrap"><canvas></canvas></div>
+        `;
+        tile.addEventListener('click', () => acModal(key));
+        grid.appendChild(tile);
+
+        const ctx = tile.querySelector('canvas').getContext('2d');
+        kucukChartlar[key] = new Chart(ctx, chartAyarlari(sektor.seri, true));
+      });
+
+      // --- buyutme modali ---
+      const overlay = document.getElementById('sector-modal-overlay');
+      const modalTitle = document.getElementById('sector-modal-title');
+      const modalTickers = document.getElementById('sector-modal-tickers');
+      const modalCanvas = document.getElementById('sector-modal-canvas');
+      let modalChart = null;
+
+      function acModal(key) {
+        const sektor = veri[key];
+        modalTitle.textContent = sektor.title;
+        modalTickers.textContent = ` (${sektor.fiyat_ticker} + ${sektor.genislik_ticker})`;
+
+        if (modalChart) modalChart.destroy();
+        const ctx = modalCanvas.getContext('2d');
+        modalChart = new Chart(ctx, chartAyarlari(sektor.seri, false));
+
+        const tarihler = sektor.seri.map(d => d.tarih);
+        const kapanislar = sektor.seri.map(d => d.kapanis);
+        createDateRangeSlider({
+          container: document.getElementById('sector-modal-slider'),
+          dates: tarihler,
+          values: kapanislar,
+          chart: null, // ozel: asagida modalChart'i zaman ekseninde guncelliyoruz
+        });
+        // date-range-slider varsayilan olarak category x eksenini bekliyor;
+        // burada time-scale kullandigimiz icin secimi kendimiz uyguluyoruz.
+        const slider = document.getElementById('sector-modal-slider');
+        slider.querySelectorAll('.drs-handle').forEach((handle) => {
+          handle.addEventListener('input', () => {
+            const l = parseInt(slider.querySelector('.drs-handle-left').value, 10);
+            const r = parseInt(slider.querySelector('.drs-handle-right').value, 10);
+            const lo = Math.min(l, r), hi = Math.max(l, r);
+            modalChart.options.scales.x.min = new Date(tarihler[lo]).getTime();
+            modalChart.options.scales.x.max = new Date(tarihler[hi]).getTime();
+            modalChart.update('none');
+          });
+        });
+
+        overlay.classList.add('acik');
+      }
+
+      function kapatModal() {
+        overlay.classList.remove('acik');
+      }
+
+      document.getElementById('sector-modal-close').addEventListener('click', kapatModal);
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) kapatModal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') kapatModal();
+      });
+    </script>
+  {% else %}
+    <p class="ts">Bu sayfa icin henuz veri cekilmedi. Scheduler calistiginda burasi dolacak (TR saatiyle her gun 23:00).</p>
+  {% endif %}
+{% endblock %}
