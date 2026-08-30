@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}{{ source.title }} - Veri Terminali{% endblock %}
+{% block content %}
+  <p><a href="{{ url_for('panel') }}">&larr; panel</a></p>
+  <h1>{{ source.title }}</h1>
+  {% if record %}
+    <p class="ts">son guncelleme: {{ record.guncellenme_zamani }} (TR saatiyle her gun 23:00'te)</p>
+
+    <div class="chart-controls">
+      <span class="size-controls">
+        <label>Genislik (px): <input type="number" id="chart-width" min="200" max="4000" step="10" placeholder="otomatik"></label>
+        <label>Yukseklik (px): <input type="number" id="chart-height" min="150" max="3000" step="10" placeholder="otomatik"></label>
+        <button type="button" id="apply-size" class="btn-sm">Uygula</button>
+        <button type="button" id="reset-size" class="btn-sm btn-sm-ghost">Sifirla</button>
+      </span>
+    </div>
+    <div class="chart-wrap" id="chart-wrap">
+      <canvas id="chart"></canvas>
+    </div>
+    <div id="date-range-slider"></div>
+    <p class="ts">
+      Mavi (yukarida): S&amp;P 500 uyelerinin yuzde kacinin 14 gunluk RSI'i
+      70'in uzerinde (asiri alim). Turuncu (asagida, negatif eksende
+      gosteriliyor ama deger her zaman pozitif bir yuzdedir): yuzde kacinin
+      30'un altinda (asiri satim). Ham fiyat verisi Yahoo Finance'den,
+      RSI kendimiz hesapliyoruz - TradingView'de bu veriye ait hazir bir
+      ticker bulunamadi. Lejanttaki ogelere tiklayarak acip kapatabilirsiniz.
+    </p>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="{{ url_for('static', filename='date-range-slider.js') }}"></script>
+    <script>
+      const veri = {{ record.veri | tojson }};
+      const etiketler = veri.map(d => d.tarih);
+      const ustunde70 = veri.map(d => d.ustunde_70_yuzde);
+      const altinda30 = veri.map(d => -d.altinda_30_yuzde);  // gorsel olarak eksende asagida gostermek icin negatif
+
+      const ctx = document.getElementById('chart').getContext('2d');
+      const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: etiketler,
+          datasets: [
+            {
+              label: '% 14g RSI > 70 (asiri alim)',
+              data: ustunde70,
+              backgroundColor: 'rgba(79,140,224,0.8)',
+              borderWidth: 0,
+              barPercentage: 1.0,
+              categoryPercentage: 1.0,
+            },
+            {
+              label: '% 14g RSI < 30 (asiri satim)',
+              data: altinda30,
+              backgroundColor: 'rgba(224,166,62,0.8)',
+              borderWidth: 0,
+              barPercentage: 1.0,
+              categoryPercentage: 1.0,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: {
+              ticks: { color: '#8a90a2', maxTicksLimit: 12 },
+              grid: { color: '#1c2130' },
+            },
+            y: {
+              ticks: {
+                color: '#8a90a2',
+                callback: (v) => Math.abs(v) + '%',
+              },
+              grid: {
+                color: (c) => c.tick.value === 0 ? '#4a5164' : '#1c2130',
+              },
+            },
+          },
+          plugins: {
+            legend: { labels: { color: '#e6e8ee' } },
+            tooltip: {
+              callbacks: {
+                label: (item) => `${item.dataset.label.replace(/^%.*?\)/, '')}: ${Math.abs(item.parsed.y).toFixed(1)}%`,
+              },
+            },
+          },
+        },
+      });
+
+      createDateRangeSlider({
+        container: document.getElementById('date-range-slider'),
+        dates: etiketler,
+        values: ustunde70,
+        chart: chart,
+      });
+
+      // Kullanicinin girdigi genislik/yukseklige gore grafik boyutu
+      const wrap = document.getElementById('chart-wrap');
+      const widthInput = document.getElementById('chart-width');
+      const heightInput = document.getElementById('chart-height');
+      const STORAGE_KEY = 'rsi_breadth_size';
+
+      function applySize(width, height) {
+        wrap.style.width = width ? width + 'px' : '';
+        wrap.style.height = height ? height + 'px' : '';
+        wrap.style.maxWidth = width ? 'none' : '';
+        wrap.style.maxHeight = height ? 'none' : '';
+        chart.resize();
+      }
+
+      function saveSize(width, height) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ width, height }));
+        } catch (e) { /* localStorage yoksa sessizce gec */ }
+      }
+
+      document.getElementById('apply-size').addEventListener('click', () => {
+        const width = parseInt(widthInput.value, 10) || null;
+        const height = parseInt(heightInput.value, 10) || null;
+        applySize(width, height);
+        saveSize(width, height);
+      });
+
+      document.getElementById('reset-size').addEventListener('click', () => {
+        widthInput.value = '';
+        heightInput.value = '';
+        applySize(null, null);
+        saveSize(null, null);
+      });
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if (saved && (saved.width || saved.height)) {
+          if (saved.width) widthInput.value = saved.width;
+          if (saved.height) heightInput.value = saved.height;
+          applySize(saved.width, saved.height);
+        }
+      } catch (e) { /* localStorage yoksa sessizce gec */ }
+    </script>
+  {% else %}
+    <p class="ts">Bu sayfa icin henuz veri cekilmedi. Scheduler calistiginda burasi dolacak (TR saatiyle her gun 23:00).</p>
+  {% endif %}
+{% endblock %}

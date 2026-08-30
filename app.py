@@ -68,6 +68,7 @@ CUSTOM_TEMPLATES = {
     "market_relative": "market_relative.html",
     "sector_breadth": "sector_breadth.html",
     "index_breadth": "index_breadth.html",
+    "rsi_breadth": "rsi_breadth.html",
 }
 
 

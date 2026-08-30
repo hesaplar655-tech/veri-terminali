@@ -15,7 +15,7 @@ Zamanlama iki sekilde tanimlanabilir (birini kullan):
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from sources import ornek, ekonomik_takvim, sp500_concentration, sp500_breadth, market_relative, sector_breadth, index_breadth
+from sources import ornek, ekonomik_takvim, sp500_concentration, sp500_breadth, market_relative, sector_breadth, index_breadth, rsi_breadth
 
 
 @dataclass
@@ -65,6 +65,12 @@ SOURCES: list[Source] = [
         key="index_breadth",
         title="Endeks Genislikleri: S&P 500 / Nasdaq / Russell 2000",
         fetch=index_breadth.fetch,
+        daily_at_tr="23:00",
+    ),
+    Source(
+        key="rsi_breadth",
+        title="S&P 500 RSI Genisligi (14g, Asiri Alim/Satim)",
+        fetch=rsi_breadth.fetch,
         daily_at_tr="23:00",
     ),
     Source(

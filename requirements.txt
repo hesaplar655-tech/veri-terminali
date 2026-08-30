@@ -2,3 +2,5 @@ Flask==3.0.3
 schedule==1.2.2
 requests==2.32.3
 tvdatafeed @ git+https://github.com/rongardF/tvdatafeed.git
+pandas==3.0.5
+lxml==5.3.0

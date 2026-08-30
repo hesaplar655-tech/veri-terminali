@@ -59,8 +59,24 @@ always-on task olarak `scheduler.py` calisiyor)
     INDEX:NCFI/NCTH, INDEX:R2FI/R2TH). S&P 500 disindaki ticker'lar da
     TradingView'in sembol arama API'sinden bulunup tvDatafeed ile
     dogrulandi. Sayfasi `templates/index_breadth.html` icinde iki ust uste
-    grafik (50g, 200g), uc endeks de lejanttan acilir/kapanir, tek bir
-    kaydirici ikisini birden zoomlar.
+    grafik (50g, 200g), uc endeks de lejanttan acilir/kapanir, her grafigin
+    kendi bagimsiz tarih araligi kaydiricisi var (biri digerini zoomlamaz).
+  - `rsi_breadth.py` - S&P 500 uyelerinin yuzde kacinin 14 gunluk RSI'i 70'in
+    uzerinde (asiri alim) ve yuzde kacinin 30'un altinda (asiri satim)
+    oldugu. Bu veri TradingView'de arastirildi (sembol arama API'si + tahmin
+    edilebilir ticker kaliplari - S5RH, S5RSI, S5OB vb.) ama bulunamadi;
+    bunun yerine ham kapanis fiyatlarini Yahoo Finance chart API'sinden
+    (query1.finance.yahoo.com, hizli, kimlik dogrulama gerektirmiyor) tum
+    503 S&P 500 uyesi icin cekip RSI'i kendimiz hesapliyoruz (Wilder'in
+    yumusatma yontemi, EWM alpha=1/14). Uye listesi Wikipedia'nin "List of
+    S&P 500 companies" tablosundan aliniyor. 503 hisse icin cekim ~2-3
+    dakika suruyor ama neredeyse tamami ag bekleme suresi (CPU degil),
+    PythonAnywhere'in CPU-saniye kotasini pratikte zorlamiyor;
+    `daily_at_tr="23:00"` ile gunde 1 kez calisir. Sayfasi
+    `templates/rsi_breadth.html` icinde Bloomberg tarzi bar chart (mavi:
+    >70 yukarida, turuncu: <30 asagida negatif eksende gosteriliyor ama
+    deger her zaman pozitif yuzde), lejanttan acilir/kapanir, tarih araligi
+    kaydiricisi ve genislik/yukseklik girisi var.
 - `static/date-range-slider.js` - grafik kartlarinin altina eklenen, yeniden
   kullanilabilir cift tutamacli tarih araligi kaydiricisi (mini onizleme +
   Chart.js x ekseni zoom).
