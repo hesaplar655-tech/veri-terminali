@@ -140,6 +140,9 @@ table th {
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 1rem;
+  height: 60vh;
+  max-height: 480px;
+  min-height: 280px;
 }
 
 .devam-et-wrap {

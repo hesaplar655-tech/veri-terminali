@@ -10,7 +10,7 @@
       <label><input type="checkbox" id="toggle-shading" checked> arka plan golgelendirme (200 gunluk ortalamaya gore)</label>
     </div>
     <div class="chart-wrap">
-      <canvas id="chart" height="420"></canvas>
+      <canvas id="chart"></canvas>
     </div>
     <p class="ts">
       Turkuaz cizgi: S&amp;P 500 (SPY, piyasa degeri agirlikli) kapanis fiyati (sol eksen).
@@ -83,6 +83,7 @@
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
           scales: {
             x: {
