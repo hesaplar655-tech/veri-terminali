@@ -8,8 +8,14 @@
 
     <div class="chart-controls">
       <label><input type="checkbox" id="toggle-shading" checked> arka plan golgelendirme (200 gunluk ortalamaya gore)</label>
+      <span class="size-controls">
+        <label>Genislik (px): <input type="number" id="chart-width" min="200" max="4000" step="10" placeholder="otomatik"></label>
+        <label>Yukseklik (px): <input type="number" id="chart-height" min="150" max="3000" step="10" placeholder="otomatik"></label>
+        <button type="button" id="apply-size" class="btn-sm">Uygula</button>
+        <button type="button" id="reset-size" class="btn-sm btn-sm-ghost">Sifirla</button>
+      </span>
     </div>
-    <div class="chart-wrap">
+    <div class="chart-wrap" id="chart-wrap">
       <canvas id="chart"></canvas>
     </div>
     <p class="ts">
@@ -125,6 +131,50 @@
         chart.$golgeAcik = e.target.checked;
         chart.draw();
       });
+
+      // Kullanicinin girdigi genislik/yukseklige gore grafik boyutu
+      const wrap = document.getElementById('chart-wrap');
+      const widthInput = document.getElementById('chart-width');
+      const heightInput = document.getElementById('chart-height');
+      const STORAGE_KEY = 'sp500_concentration_size';
+
+      function applySize(width, height) {
+        wrap.style.width = width ? width + 'px' : '';
+        wrap.style.height = height ? height + 'px' : '';
+        wrap.style.maxWidth = width ? 'none' : '';
+        wrap.style.maxHeight = height ? 'none' : '';
+        chart.resize();
+      }
+
+      function saveSize(width, height) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ width, height }));
+        } catch (e) { /* localStorage yoksa sessizce gec */ }
+      }
+
+      document.getElementById('apply-size').addEventListener('click', () => {
+        const width = parseInt(widthInput.value, 10) || null;
+        const height = parseInt(heightInput.value, 10) || null;
+        applySize(width, height);
+        saveSize(width, height);
+      });
+
+      document.getElementById('reset-size').addEventListener('click', () => {
+        widthInput.value = '';
+        heightInput.value = '';
+        applySize(null, null);
+        saveSize(null, null);
+      });
+
+      // Sayfa acilirken daha once kaydedilmis bir boyut varsa uygula
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if (saved && (saved.width || saved.height)) {
+          if (saved.width) widthInput.value = saved.width;
+          if (saved.height) heightInput.value = saved.height;
+          applySize(saved.width, saved.height);
+        }
+      } catch (e) { /* localStorage yoksa sessizce gec */ }
     </script>
   {% else %}
     <p class="ts">Bu sayfa icin henuz veri cekilmedi. Scheduler calistiginda burasi dolacak (TR saatiyle her gun 23:00).</p>
