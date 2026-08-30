@@ -1,0 +1,167 @@
+:root {
+  color-scheme: dark;
+  --bg: #0b0e14;
+  --panel: #131722;
+  --text: #e6e8ee;
+  --muted: #8a90a2;
+  --accent: #4fd1c5;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+
+.topbar {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #232838;
+}
+
+.brand {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.page-list {
+  list-style: none;
+  padding: 0;
+}
+
+.page-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--panel);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.page-list a {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.ts {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.data-block {
+  background: var(--panel);
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+/* Giris sayfasi / ekonomik takvim */
+.giris-header {
+  margin-bottom: 1.5rem;
+}
+
+.takvim-gun {
+  margin-bottom: 1.25rem;
+}
+
+.takvim-gun-baslik {
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  color: var(--muted);
+}
+
+.takvim-gun.bugun .takvim-gun-baslik {
+  color: var(--accent);
+}
+
+.ts.uyari {
+  color: #d0a23a;
+  margin-bottom: 1rem;
+}
+
+.table {
+  overflow-x: auto;
+  background: var(--panel);
+  border-radius: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+table th, table td {
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid #232838;
+  white-space: nowrap;
+}
+
+table th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.onem {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.onem-dusuk { background: #3a4358; }
+.onem-orta { background: #d0a23a; }
+.onem-yuksek { background: #e0554f; }
+
+.gerceklesen-yukari { color: #3ecf6e; font-weight: 700; }
+.gerceklesen-asagi { color: #e0554f; font-weight: 700; }
+
+.devam-et-wrap {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.btn-devam {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  background: var(--accent);
+  color: #0b0e14;
+  text-decoration: none;
+  font-weight: 700;
+  border-radius: 999px;
+}
+
+/* Panel / kartlar */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: block;
+  background: var(--panel);
+  border-radius: 8px;
+  padding: 1rem;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid #232838;
+}
+
+.card-title {
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}

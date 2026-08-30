@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Veri Terminali{% endblock %}
+{% block content %}
+  <div class="giris-header">
+    <h1>{{ bugun_gorunum }}</h1>
+    {% if guncellenme_zamani %}
+      <p class="ts">takvim guncellemesi: {{ guncellenme_zamani }}</p>
+    {% else %}
+      <p class="ts">takvim verisi henuz cekilmedi, scheduler calistiginda dolacak</p>
+    {% endif %}
+  </div>
+
+  <h2>Gecen Hafta - Onumuzdeki Hafta - Ekonomik Takvim</h2>
+  {% for tarih, olaylar in gunler %}
+    <div class="takvim-gun {% if tarih == bugun_iso %}bugun{% endif %}">
+      <div class="takvim-gun-baslik">{{ tarih }}{% if tarih == bugun_iso %} - bugun{% endif %}</div>
+      {% if olaylar %}
+        <div class="table">
+          <table>
+            <thead>
+              <tr>
+                <th>Saat</th><th>Ulke</th><th>Onem</th><th>Olay</th>
+                <th>Gerceklesen</th><th>Beklenti</th><th>Onceki</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for e in olaylar %}
+                <tr>
+                  <td class="time">{{ e.saat }}</td>
+                  <td>{{ e.ulke_kodu }}</td>
+                  <td><span class="onem onem-{{ e.onem }}"></span></td>
+                  <td>{{ e.olay }}</td>
+                  <td class="gerceklesen-{{ e.yon }}">{{ e.gerceklesen }}</td>
+                  <td>{{ e.beklenti }}</td>
+                  <td>{{ e.onceki }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="ts">Bu gun icin (secili ulkelerde) veri yok.</p>
+      {% endif %}
+    </div>
+  {% endfor %}
+
+  <div class="devam-et-wrap">
+    <a class="btn-devam" href="{{ url_for('panel') }}">Devam Et &rarr;</a>
+  </div>
+{% endblock %}

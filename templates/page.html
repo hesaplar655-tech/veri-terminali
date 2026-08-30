@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ source.title }} - Veri Terminali{% endblock %}
+{% block content %}
+  <p><a href="{{ url_for('panel') }}">&larr; panel</a></p>
+  <h1>{{ source.title }}</h1>
+  {% if record %}
+    <p class="ts">son guncelleme: {{ record.guncellenme_zamani }}</p>
+    <pre class="data-block">{{ record.veri | tojson(indent=2) }}</pre>
+  {% else %}
+    <p>Bu sayfa icin henuz veri cekilmedi. Scheduler calistiginda burasi dolacak.</p>
+  {% endif %}
+{% endblock %}
