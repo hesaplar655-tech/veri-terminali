@@ -13,8 +13,11 @@
       <canvas id="chart" height="420"></canvas>
     </div>
     <p class="ts">
-      Mavi cizgi: S&amp;P 500 (SPY) kapanis fiyati (sol eksen).
-      Cubuklar: SPY ile MAGS (Magnificent 7 ETF) arasindaki 3 aylik getiri farki, yuzde puan (sag eksen).
+      Turkuaz cizgi: S&amp;P 500 (SPY, piyasa degeri agirlikli) kapanis fiyati (sol eksen).
+      Cubuklar: 3M Excess Return = SPW (S&amp;P 500 Esit Agirlikli, RSP) 3 aylik getirisi
+      eksi MAG7 (Magnificent 7, MAGS) 3 aylik getirisi - yuzde puan (sag eksen). Yesil =
+      SPW, Mag7'yi geride birakti (genislik/breadth iyilesiyor); kirmizi = Mag7 piyasaya
+      hakim.
       Arka plan: SPY'nin 200 gunluk ortalamasinin ne kadar uzerinde/altinda oldugu (yesil = uzerinde, kirmizi = altinda).
       Lejanttaki ogelere tiklayarak acip kapatabilirsiniz.
     </p>
@@ -70,10 +73,10 @@
             },
             {
               type: 'bar',
-              label: '3 Aylik Fark (SPY - MAGS), yuzde puan',
+              label: '3M Excess Return: SPW - MAG7 (yuzde puan)',
               data: fark3ay,
               yAxisID: 'y1',
-              backgroundColor: fark3ay.map(v => v >= 0 ? 'rgba(224,85,79,0.7)' : 'rgba(224,85,79,0.7)'),
+              backgroundColor: fark3ay.map(v => v >= 0 ? 'rgba(62,207,110,0.7)' : 'rgba(224,85,79,0.7)'),
               borderWidth: 0,
             },
           ],
