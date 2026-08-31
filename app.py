@@ -72,6 +72,7 @@ CUSTOM_TEMPLATES = {
     "bist100_rsi_breadth": "bist100_rsi_breadth.html",
     "bist100_breadth": "bist100_breadth.html",
     "bist100_ma_breadth": "bist100_ma_breadth.html",
+    "bist100_sector_drawdown": "bist100_sector_drawdown.html",
 }
 
 

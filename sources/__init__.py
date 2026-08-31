@@ -15,7 +15,7 @@ Zamanlama iki sekilde tanimlanabilir (birini kullan):
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from sources import ekonomik_takvim, sp500_concentration, sp500_breadth, market_relative, sector_breadth, index_breadth, rsi_breadth, bist100_rsi_breadth, bist100_breadth, bist100_ma_breadth
+from sources import ekonomik_takvim, sp500_concentration, sp500_breadth, market_relative, sector_breadth, index_breadth, rsi_breadth, bist100_rsi_breadth, bist100_breadth, bist100_ma_breadth, bist100_sector_drawdown
 
 
 @dataclass
@@ -78,6 +78,13 @@ SOURCES: list[Source] = [
         key="bist100_breadth",
         title="BIST 100 Genislik (% 200g MA Uzeri)",
         fetch=bist100_breadth.fetch,
+        daily_at_tr="23:00",
+        group="BIST Genislik Gostergeleri",
+    ),
+    Source(
+        key="bist100_sector_drawdown",
+        title="BIST Sektorleri: Zirveden Geri Cekilme",
+        fetch=bist100_sector_drawdown.fetch,
         daily_at_tr="23:00",
         group="BIST Genislik Gostergeleri",
     ),

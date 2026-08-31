@@ -118,6 +118,15 @@ always-on task olarak `scheduler.py` calisiyor)
     hesaplaniyor - ekstra ag istegi yok. `daily_at_tr="23:00"`. Sayfasi
     `templates/bist100_ma_breadth.html` icinde tek grafik (turkuaz 50g,
     mor 200g, 0-100 eksen), lejanttan acilir/kapanir.
+  - `bist100_sector_drawdown.py` - 32 BIST sektor endeksinin (BIST:XUSIN,
+    BIST:XBANK, BIST:XUMAL vb. - kullanicinin verdigi ticker'lar, hepsi
+    tvDatafeed ile dogrulandi) kendi o ana kadarki zirvesine gore % geri
+    cekilmesi (`market_relative.py`'deki mantigin BIST sektorlerine
+    uygulanmis hali). `daily_at_tr="23:00"`. Sayfasi
+    `templates/bist100_sector_drawdown.html` icinde `sector_breadth.html`
+    ile ayni izgara + tiklayinca buyuyen modal UX'i (32 kart, her biri tek
+    cizgili bir geri cekilme grafigi), ama Z-Score paneli yok - sadece bu
+    kartin ihtiyaci olan tek metrik gosteriliyor.
 - `static/date-range-slider.js` - grafik kartlarinin altina eklenen, yeniden
   kullanilabilir cift tutamacli tarih araligi kaydiricisi (mini onizleme +
   Chart.js x ekseni zoom).
