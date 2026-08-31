@@ -80,6 +80,24 @@ always-on task olarak `scheduler.py` calisiyor)
     yukarida, turuncu: <30 asagida negatif eksende gosteriliyor ama deger
     her zaman pozitif yuzde, sol eksen), hepsi lejanttan acilir/kapanir,
     tarih araligi kaydiricisi ve genislik/yukseklik girisi var.
+  - `bist100_rsi_breadth.py` - `rsi_breadth.py` ile ayni mantik (BIST 100
+    icin), ama ham fiyat verisi TradingView'den (tvDatafeed) cekiliyor -
+    BIST 100'un sadece 100 uyesi oldugu icin (S&P 500'un 503'u yerine)
+    kullanicinin standart tercihi olan TradingView burada performans
+    sorunu yaratmiyor. Uye listesi icin Wikipedia'daki gibi otomatik
+    guncellenen bir kaynak bulunamadi; TradingView'in kendi bilesen sayfasi
+    (tr.tradingview.com/symbols/BIST-XU100/components/) ve Midas
+    (getmidas.com/canli-borsa/xu100-bist-100-hisseleri) ile capraz
+    kontrol edilip koda sabit olarak yazildi - BIST 100 bilesimi ceyreklik
+    degisebildigi icin bu liste zamanla hafifce eskiyebilir. RSI(14)
+    Wilder'in yumusatma yontemiyle hesaplaniyor. Karsilastirma icin BIST
+    100 endeksinin hem TL (BIST:XU100) hem dolar (BIST:XU100.USD) kapanis
+    fiyati da TradingView'den cekilip iki ayri sag eksende cizgi olarak
+    ekleniyor. `daily_at_tr="23:00"`. Sayfasi
+    `templates/bist100_rsi_breadth.html` icinde `rsi_breadth.html` ile
+    ayni gorsel dil (mavi/turuncu RSI barlari sol eksen), artik iki
+    endeks fiyat cizgisi (TL turkuaz, USD mor) ayri sag eksenlerde,
+    hepsi lejanttan acilir/kapanir.
 - `static/date-range-slider.js` - grafik kartlarinin altina eklenen, yeniden
   kullanilabilir cift tutamacli tarih araligi kaydiricisi (mini onizleme +
   Chart.js x ekseni zoom).
