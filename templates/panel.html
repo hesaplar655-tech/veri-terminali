@@ -1,21 +1,24 @@
 {% extends "base.html" %}
 {% block title %}Panel - Veri Terminali{% endblock %}
 {% block content %}
-  <h1>Veriler</h1>
-  <div class="card-grid">
-    {% for p in pages %}
-      <a class="card" href="{{ url_for('page', key=p.key) }}">
-        <div class="card-title">{{ p.title }}</div>
-        <div class="ts">
-          {% if p.guncellenme_zamani %}
-            son guncelleme: {{ p.guncellenme_zamani }}
-          {% else %}
-            henuz veri yok
-          {% endif %}
-        </div>
-      </a>
-    {% else %}
-      <p class="ts">Henuz bir kart eklenmedi.</p>
-    {% endfor %}
-  </div>
+  {% for grup_adi, sayfalar in gruplar %}
+    <h1>{{ grup_adi }}</h1>
+    <div class="card-grid">
+      {% for p in sayfalar %}
+        <a class="card" href="{{ url_for('page', key=p.key) }}">
+          <div class="card-title">{{ p.title }}</div>
+          <div class="ts">
+            {% if p.guncellenme_zamani %}
+              son guncelleme: {{ p.guncellenme_zamani }}
+            {% else %}
+              henuz veri yok
+            {% endif %}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <h1>Veriler</h1>
+    <p class="ts">Henuz bir kart eklenmedi.</p>
+  {% endfor %}
 {% endblock %}

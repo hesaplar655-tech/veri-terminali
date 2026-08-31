@@ -15,7 +15,7 @@ Zamanlama iki sekilde tanimlanabilir (birini kullan):
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from sources import ornek, ekonomik_takvim, sp500_concentration, sp500_breadth, market_relative, sector_breadth, index_breadth, rsi_breadth, bist100_rsi_breadth
+from sources import ekonomik_takvim, sp500_concentration, sp500_breadth, market_relative, sector_breadth, index_breadth, rsi_breadth, bist100_rsi_breadth
 
 
 @dataclass
@@ -26,6 +26,7 @@ class Source:
     interval_unit: Optional[str] = None
     interval_value: int = 1
     daily_at_tr: Optional[str] = None   # orn. "23:00" - interval_unit yerine kullanilir
+    group: str = "SP500 Breadth"        # panel sayfasinda kartin altina gireceği baslik
 
 
 SOURCES: list[Source] = [
@@ -78,12 +79,6 @@ SOURCES: list[Source] = [
         title="BIST 100 RSI Genisligi (14g, Asiri Alim/Satim)",
         fetch=bist100_rsi_breadth.fetch,
         daily_at_tr="23:00",
-    ),
-    Source(
-        key="ornek",
-        title="Ornek Veri",
-        fetch=ornek.fetch,
-        interval_unit="hours",
-        interval_value=1,
+        group="BIST Genislik Gostergeleri",
     ),
 ]

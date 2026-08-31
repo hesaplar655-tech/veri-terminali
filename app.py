@@ -49,17 +49,17 @@ def giris():
 
 @app.route("/panel")
 def panel():
-    pages = []
+    gruplar = {}
     for source in SOURCES:
         if source.key == GIRIS_KAYNAK_KEY:
             continue
         record = storage.load(source.key)
-        pages.append({
+        gruplar.setdefault(source.group, []).append({
             "key": source.key,
             "title": source.title,
             "guncellenme_zamani": record["guncellenme_zamani"] if record else None,
         })
-    return render_template("panel.html", pages=pages)
+    return render_template("panel.html", gruplar=gruplar.items())
 
 
 CUSTOM_TEMPLATES = {
