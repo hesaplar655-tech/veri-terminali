@@ -71,6 +71,7 @@ CUSTOM_TEMPLATES = {
     "rsi_breadth": "rsi_breadth.html",
     "bist100_rsi_breadth": "bist100_rsi_breadth.html",
     "bist100_breadth": "bist100_breadth.html",
+    "bist100_ma_breadth": "bist100_ma_breadth.html",
 }
 
 

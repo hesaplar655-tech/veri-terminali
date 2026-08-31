@@ -111,6 +111,13 @@ always-on task olarak `scheduler.py` calisiyor)
     gorsel dil (mavi cubuklar sol eksen 0-100), iki endeks fiyat cizgisi
     (TL turkuaz, USD mor) ayri sag eksenlerde, hepsi lejanttan
     acilir/kapanir.
+  - `bist100_ma_breadth.py` - BIST 100 hisselerinin yuzde kacinin 50
+    gunluk ve yuzde kacinin 200 gunluk ortalamasinin uzerinde oldugu, ayni
+    grafikte iki cizgi olarak. Her hisse icin kapanis serisi tek seferde
+    cekilip (`bist100_common.py`) hem 50g hem 200g ortalama ayni seriden
+    hesaplaniyor - ekstra ag istegi yok. `daily_at_tr="23:00"`. Sayfasi
+    `templates/bist100_ma_breadth.html` icinde tek grafik (turkuaz 50g,
+    mor 200g, 0-100 eksen), lejanttan acilir/kapanir.
 - `static/date-range-slider.js` - grafik kartlarinin altina eklenen, yeniden
   kullanilabilir cift tutamacli tarih araligi kaydiricisi (mini onizleme +
   Chart.js x ekseni zoom).
