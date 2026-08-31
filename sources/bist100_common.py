@@ -17,8 +17,11 @@ import pandas as pd
 from tvDatafeed import Interval
 
 TR_TZ = timezone(timedelta(hours=3))
-N_BARS = 2200  # 2019 basindan itibaren gosterebilmek icin (+200g MA tamponu)
-START_DATE = "2019-01-01"
+N_BARS = 2200  # genis bir gecmis penceresi + 200g MA tamponu
+# RSI kartinin gecerli veri kapsamasi (MIN_KAPSAMA) bu tarihten once
+# saglanamiyor (bazi hisselerin gecmisi daha kisa); iki kart tutarli
+# olsun diye ikisi de bu tarihten baslatiliyor.
+START_DATE = "2020-10-30"
 
 BIST100_SEMBOLLER = [
     "AEFES", "AKBNK", "AKSA", "AKSEN", "ALARK", "ALTNY", "ANSGR", "ARCLK", "ASELS", "ASTOR",
