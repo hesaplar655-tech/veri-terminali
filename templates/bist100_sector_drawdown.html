@@ -34,7 +34,7 @@
     <script src="{{ url_for('static', filename='date-range-slider.js') }}"></script>
     <script>
       const veri = {{ record.veri | tojson }};  // { key: { title, ticker, seri: [...] } }
-      const ONCELIKLI = ['xu100_try', 'xu100_usd'];  // BIST 100'un kendisi izgarada en basta
+      const ONCELIKLI = ['xu100_try', 'xu100_usd', 'xtumy'];  // BIST 100 ve BIST Tum izgarada en basta
       const sektorAnahtarlari = [
         ...ONCELIKLI.filter((k) => k in veri),
         ...Object.keys(veri).filter((k) => !ONCELIKLI.includes(k)).sort((a, b) => veri[a].title.localeCompare(veri[b].title, 'tr')),

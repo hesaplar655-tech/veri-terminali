@@ -32,6 +32,7 @@ N_BARS = 2200  # genis bir gecmis penceresi, zirve hesaplamasi icin
 SECTORS = [
     {"key": "xu100_try", "title": "BIST 100 (XU100, TL)", "sembol": "XU100"},
     {"key": "xu100_usd", "title": "BIST 100 (XU100, USD)", "sembol": "XU100.USD"},
+    {"key": "xtumy", "title": "BIST Tum", "sembol": "XTUMY"},
     {"key": "xusin", "title": "BIST Sinai", "sembol": "XUSIN"},
     {"key": "xuhiz", "title": "BIST Hizmetler", "sembol": "XUHIZ"},
     {"key": "xumal", "title": "BIST Mali", "sembol": "XUMAL"},
