@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}{{ source.title }} - Veri Terminali{% endblock %}
+{% block content %}
+  <p><a href="{{ url_for('panel') }}">&larr; panel</a></p>
+  <h1>{{ source.title }}</h1>
+  {% if record %}
+    <p class="ts">son guncelleme: {{ record.guncellenme_zamani }} (TR saatiyle her gun 23:00'te)</p>
+
+    <div class="chart-controls">
+      <span class="size-controls">
+        <label>Genislik (px): <input type="number" id="chart-width" min="200" max="4000" step="10" placeholder="otomatik"></label>
+        <label>Yukseklik (px): <input type="number" id="chart-height" min="150" max="3000" step="10" placeholder="otomatik"></label>
+        <button type="button" id="apply-size" class="btn-sm">Uygula</button>
+        <button type="button" id="reset-size" class="btn-sm btn-sm-ghost">Sifirla</button>
+      </span>
+    </div>
+    <div class="chart-wrap" id="chart-wrap">
+      <canvas id="chart"></canvas>
+    </div>
+    <div id="date-range-slider"></div>
+    <p class="ts">
+      Cubuklar: 3M Excess Return = BIST 100 (BIST:XU100) 3 aylik getirisi
+      eksi BIST TUM (BIST:XTUMY) 3 aylik getirisi - yuzde puan (sag
+      eksen). Yesil = BIST 100 genel piyasayi geride birakti; kirmizi =
+      genel piyasa BIST 100'den daha iyi performans gosterdi. Turkuaz
+      cizgi: BIST 100 (XU100) TL kapanis fiyati. Mor cizgi: BIST 100
+      (XU100) dolar kapanis fiyati (ikisi de sol eksenler). Tum veriler
+      TradingView'den (tvDatafeed). Lejanttaki ogelere tiklayarak acip
+      kapatabilirsiniz.
+    </p>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="{{ url_for('static', filename='date-range-slider.js') }}"></script>
+    <script>
+      const veri = {{ record.veri | tojson }};
+      const etiketler = veri.map(d => d.tarih);
+      const fark3ay = veri.map(d => d["3ay_fark_yuzde"]);
+      const xu100Try = veri.map(d => d.xu100_try);
+      const xu100Usd = veri.map(d => d.xu100_usd ?? null);
+
+      const ctx = document.getElementById('chart').getContext('2d');
+      const chart = new Chart(ctx, {
+        data: {
+          labels: etiketler,
+          datasets: [
+            {
+              type: 'bar',
+              label: '3M Excess Return: XU100 - XTUMY (yuzde puan)',
+              data: fark3ay,
+              yAxisID: 'y',
+              backgroundColor: fark3ay.map(v => v >= 0 ? 'rgba(62,207,110,0.7)' : 'rgba(224,85,79,0.7)'),
+              borderWidth: 0,
+              barPercentage: 1.0,
+              categoryPercentage: 1.0,
+            },
+            {
+              type: 'line',
+              label: 'BIST 100 (XU100, TL)',
+              data: xu100Try,
+              yAxisID: 'y2',
+              borderColor: '#4fd1c5',
+              backgroundColor: '#4fd1c5',
+              pointRadius: 0,
+              borderWidth: 1.5,
+              tension: 0.1,
+            },
+            {
+              type: 'line',
+              label: 'BIST 100 (XU100, USD)',
+              data: xu100Usd,
+              yAxisID: 'y3',
+              borderColor: '#b48ce0',
+              backgroundColor: '#b48ce0',
+              pointRadius: 0,
+              borderWidth: 1.5,
+              tension: 0.1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: {
+              ticks: { color: '#8a90a2', maxTicksLimit: 12 },
+              grid: { color: '#1c2130' },
+            },
+            y: {
+              position: 'right',
+              ticks: { color: '#8a90a2' },
+              grid: { color: (c) => c.tick.value === 0 ? '#4a5164' : '#1c2130' },
+              title: { display: true, text: '3 aylik fark (yuzde puan)', color: '#8a90a2' },
+            },
+            y2: {
+              position: 'left',
+              ticks: { color: '#8a90a2' },
+              grid: { display: false },
+              title: { display: true, text: 'XU100 (TL)', color: '#8a90a2' },
+            },
+            y3: {
+              position: 'left',
+              ticks: { color: '#8a90a2' },
+              grid: { display: false },
+              title: { display: true, text: 'XU100 (USD)', color: '#8a90a2' },
+            },
+          },
+          plugins: {
+            legend: { labels: { color: '#e6e8ee' } },
+          },
+        },
+      });
+
+      createDateRangeSlider({
+        container: document.getElementById('date-range-slider'),
+        dates: etiketler,
+        values: xu100Try,
+        chart: chart,
+      });
+
+      // Kullanicinin girdigi genislik/yukseklige gore grafik boyutu
+      const wrap = document.getElementById('chart-wrap');
+      const widthInput = document.getElementById('chart-width');
+      const heightInput = document.getElementById('chart-height');
+      const STORAGE_KEY = 'bist100_excess_return_size';
+
+      function applySize(width, height) {
+        wrap.style.width = width ? width + 'px' : '';
+        wrap.style.height = height ? height + 'px' : '';
+        wrap.style.maxWidth = width ? 'none' : '';
+        wrap.style.maxHeight = height ? 'none' : '';
+        chart.resize();
+      }
+
+      function saveSize(width, height) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ width, height }));
+        } catch (e) { /* localStorage yoksa sessizce gec */ }
+      }
+
+      document.getElementById('apply-size').addEventListener('click', () => {
+        const width = parseInt(widthInput.value, 10) || null;
+        const height = parseInt(heightInput.value, 10) || null;
+        applySize(width, height);
+        saveSize(width, height);
+      });
+
+      document.getElementById('reset-size').addEventListener('click', () => {
+        widthInput.value = '';
+        heightInput.value = '';
+        applySize(null, null);
+        saveSize(null, null);
+      });
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if (saved && (saved.width || saved.height)) {
+          if (saved.width) widthInput.value = saved.width;
+          if (saved.height) heightInput.value = saved.height;
+          applySize(saved.width, saved.height);
+        }
+      } catch (e) { /* localStorage yoksa sessizce gec */ }
+    </script>
+  {% else %}
+    <p class="ts">Bu sayfa icin henuz veri cekilmedi. Scheduler calistiginda burasi dolacak (TR saatiyle her gun 23:00).</p>
+  {% endif %}
+{% endblock %}

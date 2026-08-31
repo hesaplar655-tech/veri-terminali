@@ -127,6 +127,18 @@ always-on task olarak `scheduler.py` calisiyor)
     ile ayni izgara + tiklayinca buyuyen modal UX'i (32 kart, her biri tek
     cizgili bir geri cekilme grafigi), ama Z-Score paneli yok - sadece bu
     kartin ihtiyaci olan tek metrik gosteriliyor.
+  - `bist100_excess_return.py` - `sp500_concentration.py`'deki 3 aylik
+    excess return mantiginin BIST'e uygulanmis hali: BIST 100'un
+    (BIST:XU100) 3 aylik (63 islem gunu) getirisi eksi BIST TUM'un
+    (BIST:XTUMY) 3 aylik getirisi. XU100/XTUMY endeks seviyesinde
+    ticker'lar oldugu icin (100 tek tek hisse degil) diger BIST
+    kartlarindaki 2020-10-30 sinirlamasi burada yok - veri 2019 basindan
+    itibaren gosteriliyor. Karsilastirma icin XU100'un hem TL hem USD
+    kapanis fiyati da ayri eksenlerde cizgi olarak ekleniyor.
+    `daily_at_tr="23:00"`. Sayfasi `templates/bist100_excess_return.html`
+    icinde `sp500_concentration.html` ile benzer gorsel dil (yesil/kirmizi
+    fark cubuklari sag eksen + fiyat cizgileri sol eksenler), ama 200g MA
+    golgelendirmesi yok (istenmedi).
 - `static/date-range-slider.js` - grafik kartlarinin altina eklenen, yeniden
   kullanilabilir cift tutamacli tarih araligi kaydiricisi (mini onizleme +
   Chart.js x ekseni zoom).
