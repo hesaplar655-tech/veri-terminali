@@ -23,7 +23,7 @@ TR saatiyle gunde 1 kez (23:00) calisir.
 import pandas as pd
 from tvDatafeed import TvDatafeed
 
-from sources.bist100_common import BIST100_SEMBOLLER, gunluk_seri, xu100_serileri
+from sources.bist100_common import BIST100_SEMBOLLER, START_DATE, gunluk_seri, xu100_serileri
 
 RSI_PERIOD = 14
 MIN_KAPSAMA = 0.7  # gunun gecerli sayilmasi icin hisselerin en az %70'inde RSI olmali
@@ -62,6 +62,8 @@ def fetch():
     min_hisse = int(len(rsi_serileri) * MIN_KAPSAMA)
     events = []
     for tarih, satir in rsi_df.iterrows():
+        if tarih < START_DATE:
+            continue
         gecerli = satir.dropna()
         if len(gecerli) < min_hisse:
             continue

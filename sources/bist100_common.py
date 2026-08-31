@@ -17,7 +17,8 @@ import pandas as pd
 from tvDatafeed import Interval
 
 TR_TZ = timezone(timedelta(hours=3))
-N_BARS = 600  # ~2 yillik gunluk bar + tampon
+N_BARS = 2200  # 2019 basindan itibaren gosterebilmek icin (+200g MA tamponu)
+START_DATE = "2019-01-01"
 
 BIST100_SEMBOLLER = [
     "AEFES", "AKBNK", "AKSA", "AKSEN", "ALARK", "ALTNY", "ANSGR", "ARCLK", "ASELS", "ASTOR",
