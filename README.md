@@ -97,7 +97,20 @@ always-on task olarak `scheduler.py` calisiyor)
     `templates/bist100_rsi_breadth.html` icinde `rsi_breadth.html` ile
     ayni gorsel dil (mavi/turuncu RSI barlari sol eksen), artik iki
     endeks fiyat cizgisi (TL turkuaz, USD mor) ayri sag eksenlerde,
-    hepsi lejanttan acilir/kapanir.
+    hepsi lejanttan acilir/kapanir. BIST 100 uye listesi, gunluk seri
+    cekme ve XU100 (TL/USD) yardimcilari `bist100_common.py`'de -
+    `bist100_breadth.py` ile paylasiliyor.
+  - `bist100_breadth.py` - `sp500_breadth.py`'nin BIST 100 hali: BIST 100
+    hisselerinin yuzde kacinin 200 gunluk hareketli ortalamasinin uzerinde
+    oldugu ("genislik/breadth"). Ham fiyat verisi TradingView'den
+    (tvDatafeed) cekiliyor, ayni uye listesi ve yardimcilar
+    `bist100_common.py`'den geliyor. Karsilastirma icin BIST 100
+    endeksinin hem TL hem USD kapanis fiyati ayri sag eksenlerde cizgi
+    olarak ekleniyor. `daily_at_tr="23:00"`. Sayfasi
+    `templates/bist100_breadth.html` icinde `sp500_breadth.html` ile ayni
+    gorsel dil (mavi cubuklar sol eksen 0-100), iki endeks fiyat cizgisi
+    (TL turkuaz, USD mor) ayri sag eksenlerde, hepsi lejanttan
+    acilir/kapanir.
 - `static/date-range-slider.js` - grafik kartlarinin altina eklenen, yeniden
   kullanilabilir cift tutamacli tarih araligi kaydiricisi (mini onizleme +
   Chart.js x ekseni zoom).
