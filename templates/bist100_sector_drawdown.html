@@ -34,7 +34,11 @@
     <script src="{{ url_for('static', filename='date-range-slider.js') }}"></script>
     <script>
       const veri = {{ record.veri | tojson }};  // { key: { title, ticker, seri: [...] } }
-      const sektorAnahtarlari = Object.keys(veri);
+      const ONCELIKLI = ['xu100_try', 'xu100_usd'];  // BIST 100'un kendisi izgarada en basta
+      const sektorAnahtarlari = [
+        ...ONCELIKLI.filter((k) => k in veri),
+        ...Object.keys(veri).filter((k) => !ONCELIKLI.includes(k)).sort((a, b) => veri[a].title.localeCompare(veri[b].title, 'tr')),
+      ];
 
       function drawdownRengi(seri) {
         const son = seri[seri.length - 1].drawdown_yuzde;
@@ -56,7 +60,7 @@
                 pointRadius: 0,
                 borderWidth: kucukMu ? 1 : 1.5,
                 tension: 0.1,
-                fill: kucukMu ? false : 'origin',
+                fill: false,
               },
             ],
           },

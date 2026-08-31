@@ -3,6 +3,8 @@ BIST 100 icindeki 32 sektor endeksinin (BIST:XUSIN, BIST:XBANK vb.) kendi
 o ana kadarki zirvesine (rolling peak) gore % geri cekilme (drawdown)
 gostergesi - market_relative.py'deki mantigin BIST sektorlerine uygulanmis
 hali (deger 0 = yeni zirve, negatif = zirveden ne kadar asagida).
+Karsilastirma icin BIST 100'un kendisi de (hem TL BIST:XU100 hem dolar
+BIST:XU100.USD) ayni izgarada birer kart olarak ekleniyor.
 
 Ticker'lar kullanicinin verdigi TradingView sektor endeksi kodlari,
 hepsinin basina "BIST:" ekleniyor (orn. BIST:XBANK). Hepsi tvDatafeed ile
@@ -28,6 +30,8 @@ TR_TZ = timezone(timedelta(hours=3))
 N_BARS = 2200  # genis bir gecmis penceresi, zirve hesaplamasi icin
 
 SECTORS = [
+    {"key": "xu100_try", "title": "BIST 100 (XU100, TL)", "sembol": "XU100"},
+    {"key": "xu100_usd", "title": "BIST 100 (XU100, USD)", "sembol": "XU100.USD"},
     {"key": "xusin", "title": "BIST Sinai", "sembol": "XUSIN"},
     {"key": "xuhiz", "title": "BIST Hizmetler", "sembol": "XUHIZ"},
     {"key": "xumal", "title": "BIST Mali", "sembol": "XUMAL"},
