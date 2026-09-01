@@ -24,6 +24,7 @@ suresi (CPU degil) - PythonAnywhere'in CPU-saniye kotasini pratikte
 zorlamiyor. TR saatiyle gunde 1 kez (23:00) calisir.
 """
 import io
+from concurrent.futures import ThreadPoolExecutor
 from datetime import timezone, timedelta
 
 import pandas as pd
@@ -76,14 +77,34 @@ def _kapanis_serisi(session, sembol):
     return pd.Series(degerler, index=pd.Index(tarihler, name="tarih"))
 
 
-def _spx_kapanis_gunluk():
+def _spx_kapanis_gunluk_dene():
     tv = TvDatafeed()
     df = tv.get_hist(symbol="SPX", exchange="SPCFD", interval=Interval.in_daily, n_bars=600)
+    if df is None or df.empty:
+        return {}
     out = {}
     for ts, row in df.iterrows():
         d = ts.tz_localize("UTC").astimezone(TR_TZ).strftime("%Y-%m-%d") if ts.tzinfo is None else ts.astimezone(TR_TZ).strftime("%Y-%m-%d")
         out[d] = round(float(row["close"]), 2)
     return out
+
+
+def _spx_kapanis_gunluk(deneme_sayisi=2, zaman_asimi=30):
+    # tvDatafeed'in websocket'i PythonAnywhere'de bazen (nadiren) hicbir hata
+    # vermeden sonsuza kadar bekleyebiliyor; zaman asimi olmadan bu tek cagri
+    # tum kartin gunluk guncellemesini kilitleyebilir. Zaman asiminda veya
+    # hatada bir kez daha denenir, yine basarisiz olursa SPX o gun icin
+    # atlanir (kartin geri kalani - RSI verisi - yine de guncellenir).
+    for deneme in range(deneme_sayisi):
+        executor = ThreadPoolExecutor(max_workers=1)
+        try:
+            future = executor.submit(_spx_kapanis_gunluk_dene)
+            return future.result(timeout=zaman_asimi)
+        except Exception:
+            continue
+        finally:
+            executor.shutdown(wait=False)
+    return {}
 
 
 def _rsi(kapanislar: pd.Series) -> pd.Series:
