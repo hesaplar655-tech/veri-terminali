@@ -4,7 +4,7 @@
   <p><a href="{{ url_for('panel') }}">&larr; panel</a></p>
   <h1>{{ source.title }}</h1>
   {% if record %}
-    <p class="ts">son guncelleme: {{ record.guncellenme_zamani }} (TR saatiyle her gun 23:00'te)</p>
+    <p class="ts">son guncelleme: {{ record.guncellenme_zamani }} (TR saatiyle her gun 19:00'da)</p>
 
     <div class="chart-controls">
       <span class="size-controls">
@@ -161,6 +161,6 @@
       } catch (e) { /* localStorage yoksa sessizce gec */ }
     </script>
   {% else %}
-    <p class="ts">Bu sayfa icin henuz veri cekilmedi. Scheduler calistiginda burasi dolacak (TR saatiyle her gun 23:00).</p>
+    <p class="ts">Bu sayfa icin henuz veri cekilmedi. Scheduler calistiginda burasi dolacak (TR saatiyle her gun 19:00).</p>
   {% endif %}
 {% endblock %}
