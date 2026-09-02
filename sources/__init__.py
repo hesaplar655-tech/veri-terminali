@@ -41,13 +41,13 @@ SOURCES: list[Source] = [
         key="sp500_concentration",
         title="S&P 500 Konsantrasyonu",
         fetch=sp500_concentration.fetch,
-        daily_at_tr="23:00",
+        daily_at_tr="23:45",
     ),
     Source(
         key="sp500_breadth",
         title="S&P 500 Genislik (% 200g MA Uzeri)",
         fetch=sp500_breadth.fetch,
-        daily_at_tr="23:00",
+        daily_at_tr="23:45",
     ),
     Source(
         key="market_relative",
@@ -60,19 +60,19 @@ SOURCES: list[Source] = [
         key="sector_breadth",
         title="Sektor Genislikleri (% 20g MA Uzeri)",
         fetch=sector_breadth.fetch,
-        daily_at_tr="23:00",
+        daily_at_tr="23:45",
     ),
     Source(
         key="index_breadth",
         title="Endeks Genislikleri: S&P 500 / Nasdaq / Russell 2000",
         fetch=index_breadth.fetch,
-        daily_at_tr="23:00",
+        daily_at_tr="23:45",
     ),
     Source(
         key="rsi_breadth",
         title="S&P 500 RSI Genisligi (14g, Asiri Alim/Satim)",
         fetch=rsi_breadth.fetch,
-        daily_at_tr="23:00",
+        daily_at_tr="23:45",
     ),
     Source(
         key="bist100_breadth",

@@ -4,7 +4,7 @@
   <p><a href="{{ url_for('panel') }}">&larr; panel</a></p>
   <h1>{{ source.title }}</h1>
   {% if record %}
-    <p class="ts">son guncelleme: {{ record.guncellenme_zamani }} (TR saatiyle her gun 23:00'te)</p>
+    <p class="ts">son guncelleme: {{ record.guncellenme_zamani }} (TR saatiyle her gun 23:45'te)</p>
     <p class="ts">
       Her kart: mum grafik (fiyat, sol eksen) + turkuaz cizgi (o sektordeki
       hisselerin 20 gunluk ortalamanin uzerinde olan yuzdesi, sag eksen,
@@ -317,6 +317,6 @@
       });
     </script>
   {% else %}
-    <p class="ts">Bu sayfa icin henuz veri cekilmedi. Scheduler calistiginda burasi dolacak (TR saatiyle her gun 23:00).</p>
+    <p class="ts">Bu sayfa icin henuz veri cekilmedi. Scheduler calistiginda burasi dolacak (TR saatiyle her gun 23:45).</p>
   {% endif %}
 {% endblock %}
