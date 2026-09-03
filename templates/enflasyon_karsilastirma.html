@@ -26,10 +26,14 @@
       TUFE'si. ITO: Istanbul Ticaret Odasi'nin Ucretliler Gecinme
       Endeksi'ndeki (1995=100) 12 aylik yuzde degisim - Turkiye
       genelinin degil, sadece Istanbul'daki perakende fiyat
-      hareketlerini olcer. Her kurum kendi ayini farkli bir tarihte
-      yayimlar (TUIK ve KKTC ~ayin 3-5'i, ITO ayin 1'i) - kart gunluk
-      kontrol edildigi icin yeni veri yayimlandiginda otomatik yansir.
-      Lejanttaki ogelere tiklayarak acip kapatabilirsiniz.
+      hareketlerini olcer, 2015'ten itibaren kesintisiz veri var ama
+      1 Ocak 2027'de yayimi durdurulacak. ITO (2023=100): ITO'nun yeni,
+      guncel basin bultenlerinde one cikan resmi Istanbul Tuketici
+      Fiyat Indeksi - farkli bir metodoloji/sepet kullaniyor, gecmisi
+      sadece 2024'ten itibaren var. Her kurum kendi ayini farkli bir
+      tarihte yayimlar (TUIK ve KKTC ~ayin 3-5'i, ITO ayin 1'i) - kart
+      gunluk kontrol edildigi icin yeni veri yayimlandiginda otomatik
+      yansir. Lejanttaki ogelere tiklayarak acip kapatabilirsiniz.
     </p>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <script src="{{ url_for('static', filename='date-range-slider.js') }}"></script>
@@ -39,6 +43,7 @@
       const tuik = veri.map(d => d.tuik_yillik ?? null);
       const kktc = veri.map(d => d.kktc_yillik ?? null);
       const ito = veri.map(d => d.ito_yillik ?? null);
+      const itoYeni = veri.map(d => d.ito_yeni_yillik ?? null);
 
       const ctx = document.getElementById('chart').getContext('2d');
       const chart = new Chart(ctx, {
@@ -65,12 +70,22 @@
               tension: 0.1,
             },
             {
-              label: 'ITO',
+              label: 'ITO (1995=100)',
               data: ito,
               borderColor: '#2f9e44',
               backgroundColor: '#2f9e44',
               pointRadius: 0,
               borderWidth: 1.75,
+              tension: 0.1,
+            },
+            {
+              label: 'ITO (2023=100)',
+              data: itoYeni,
+              borderColor: '#c76e00',
+              backgroundColor: '#c76e00',
+              pointRadius: 0,
+              borderWidth: 1.75,
+              borderDash: [5, 3],
               tension: 0.1,
             },
           ],

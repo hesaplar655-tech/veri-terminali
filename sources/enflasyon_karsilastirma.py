@@ -25,13 +25,21 @@ her kurumun kendi aylik veri portalindan cekiliyor:
    sayfasi ("Bir Onceki Yilin Ayni Ayina Gore") 1978'den gunumuze kadar
    yil x ay tablosu iceriyor, kimlik dogrulama gerekmiyor.
 
-3. ITO (Istanbul Ticaret Odasi) Ucretliler Gecinme Endeksi (1995=100) -
-   yillik % degisim. Kaynak: ististatistik.ito.org.tr'nin ic AJAX
-   endpoint'i (view/rapor05/index.php, IndeksId=3), tek istekte 2015'ten
-   gunumuze kadar tum yillari donduruyor, kimlik dogrulama gerekmiyor.
-   ITO bu 1995 bazli endeksi 1 Ocak 2027'de yayimlamayi durduracagini
-   acikladi (yerine 2023 bazli yeni endeks gecirilecek) - o tarihe kadar
-   IndeksId=3 kullanmaya devam edilecek.
+3. ITO (Istanbul Ticaret Odasi) - iki ayri endeks, ikisi de gosteriliyor
+   (ayni AJAX endpoint'i, view/rapor05/index.php, sadece IndeksId farkli,
+   kimlik dogrulama gerekmiyor):
+   - Ucretliler Gecinme Endeksi (1995=100), IndeksId=3: 2015'ten
+     gunumuze kesintisiz veri var - kullanicinin ilk verdigi referans
+     gorseldeki "ITO" serisiyle ayni. 1 Ocak 2027'de yayimi
+     durdurulacagi acaiklandi.
+   - Istanbul Tuketici Fiyat Indeksi (2023=100), IndeksId=1: yeni,
+     guncel basin bultenlerinde one cikan resmi rakam bu - ama gecmisi
+     sadece 2024'ten itibaren var. Kullanici, eski seriyle (39,62%
+     Agustos 2026) resmi bultendeki yeni serinin (34,96% Agustos 2026)
+     farkli oldugunu fark edip sorunca ikisi de dogrulandi (ito.org.tr
+     sitesinin kendisinden) ve ikisinin de gecerli, sadece farkli
+     metodolojili iki ayri endeks oldugu anlasildi - kullanicinin
+     tercihiyle ikisi de grafige eklendi.
 
 Yayim takvimi (TR saatiyle, resmi sabit bir gun degil, her ay bulten
 tarihinden cikarildi):
@@ -152,11 +160,11 @@ def _kktc_yillik():
     return out
 
 
-def _ito_yillik():
+def _ito_yillik(indeks_id, baslangic_yili):
     try:
         r = requests.post(
             "https://ististatistik.ito.org.tr/view/rapor05/index.php",
-            data={"IndeksId": "3", "Yil": str(START_YEAR)},
+            data={"IndeksId": str(indeks_id), "Yil": str(baslangic_yili)},
             headers=HEADERS, timeout=20,
         )
         r.raise_for_status()
@@ -190,9 +198,10 @@ def _ito_yillik():
 def fetch():
     tuik = _tuik_yillik()
     kktc = _kktc_yillik()
-    ito = _ito_yillik()
+    ito = _ito_yillik(3, START_YEAR)  # Ucretliler Gecinme Endeksi (1995=100)
+    ito_yeni = _ito_yillik(1, 2024)   # Istanbul Tuketici Fiyat Indeksi (2023=100)
 
-    tum_aylar = sorted(set(tuik) | set(kktc) | set(ito))
+    tum_aylar = sorted(set(tuik) | set(kktc) | set(ito) | set(ito_yeni))
     events = []
     for ay in tum_aylar:
         event = {"tarih": f"{ay}-01"}
@@ -202,6 +211,8 @@ def fetch():
             event["kktc_yillik"] = kktc[ay]
         if ay in ito:
             event["ito_yillik"] = ito[ay]
+        if ay in ito_yeni:
+            event["ito_yeni_yillik"] = ito_yeni[ay]
         if len(event) > 1:  # en az bir seri varsa ekle
             events.append(event)
 
