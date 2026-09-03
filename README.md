@@ -135,10 +135,19 @@ always-on task olarak `scheduler.py` calisiyor)
     kartlarindaki 2020-10-30 sinirlamasi burada yok - veri 2019 basindan
     itibaren gosteriliyor. Karsilastirma icin XU100'un hem TL hem USD
     kapanis fiyati da ayri eksenlerde cizgi olarak ekleniyor.
-    `daily_at_tr="23:00"`. Sayfasi `templates/bist100_excess_return.html`
+    `daily_at_tr="19:00"`. Sayfasi `templates/bist100_excess_return.html`
     icinde `sp500_concentration.html` ile benzer gorsel dil (yesil/kirmizi
     fark cubuklari sag eksen + fiyat cizgileri sol eksenler), ama 200g MA
     golgelendirmesi yok (istenmedi).
+  - `bist100_bank_excess_return.py` - ayni excess return mantigi, bu
+    sefer BIST Banka (BIST:XBANK) - BIST 100 (BIST:XU100): XBANK'in 3
+    aylik getirisi eksi XU100'un 3 aylik getirisi. Karsilastirma icin
+    XU100 (TL/USD) ve XBANK (TL) kapanis fiyatlari ayri eksenlerde cizgi
+    olarak ekleniyor. Endeks seviyesinde ticker'lar oldugu icin veri 2019
+    basindan itibaren. `daily_at_tr="19:00"`. Sayfasi
+    `templates/bist100_bank_excess_return.html`, `bist100_excess_return.html`
+    ile ayni gorsel dil, uc fiyat cizgisi (turkuaz XU100 TL, mor XU100
+    USD, sari XBANK TL).
 - `static/date-range-slider.js` - grafik kartlarinin altina eklenen, yeniden
   kullanilabilir cift tutamacli tarih araligi kaydiricisi (mini onizleme +
   Chart.js x ekseni zoom).
