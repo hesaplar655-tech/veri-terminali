@@ -6,7 +6,7 @@
   <title>{% block title %}Veri Terminali{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body class="{% block bodyclass %}{% endblock %}">
   <header class="topbar">
     <a class="brand" href="{{ url_for('giris') }}">Veri Terminali</a>
   </header>

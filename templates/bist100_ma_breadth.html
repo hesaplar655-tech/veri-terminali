@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block bodyclass %}bist-light{% endblock %}
 {% block title %}{{ source.title }} - Veri Terminali{% endblock %}
 {% block content %}
   <p><a href="{{ url_for('panel') }}">&larr; panel</a></p>
@@ -67,18 +68,18 @@
           interaction: { mode: 'index', intersect: false },
           scales: {
             x: {
-              ticks: { color: '#8a90a2', maxTicksLimit: 12 },
-              grid: { color: '#1c2130' },
+              ticks: { color: '#5b6172', maxTicksLimit: 12 },
+              grid: { color: '#e5e7eb' },
             },
             y: {
               min: 0,
               max: 100,
-              ticks: { color: '#8a90a2', callback: (v) => v + '%' },
-              grid: { color: '#1c2130' },
+              ticks: { color: '#5b6172', callback: (v) => v + '%' },
+              grid: { color: '#e5e7eb' },
             },
           },
           plugins: {
-            legend: { labels: { color: '#e6e8ee' } },
+            legend: { labels: { color: '#14161c' } },
             tooltip: {
               callbacks: {
                 label: (item) => `${item.dataset.label}: ${item.parsed.y.toFixed(1)}%`,
