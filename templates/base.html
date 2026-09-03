@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Veri Terminali{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- ?v= tarayici onbellegini kirmak icin - style.css'i degistirdiginde bu sayiyi artir -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2">
 </head>
 <body class="{% block bodyclass %}{% endblock %}">
   <header class="topbar">
