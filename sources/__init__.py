@@ -15,7 +15,7 @@ Zamanlama iki sekilde tanimlanabilir (birini kullan):
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from sources import ekonomik_takvim, sp500_concentration, sp500_breadth, market_relative, sector_breadth, index_breadth, rsi_breadth, bist100_rsi_breadth, bist100_breadth, bist100_ma_breadth, bist100_sector_drawdown, bist100_excess_return, bist100_bank_excess_return
+from sources import ekonomik_takvim, sp500_concentration, sp500_breadth, market_relative, sector_breadth, index_breadth, rsi_breadth, bist100_rsi_breadth, bist100_breadth, bist100_ma_breadth, bist100_sector_drawdown, bist100_excess_return, bist100_bank_excess_return, enflasyon_karsilastirma
 
 
 @dataclass
@@ -113,6 +113,13 @@ SOURCES: list[Source] = [
         key="bist100_rsi_breadth",
         title="BIST 100 RSI Genisligi (14g, Asiri Alim/Satim)",
         fetch=bist100_rsi_breadth.fetch,
+        daily_at_tr="19:00",
+        group="BIST Genislik Gostergeleri",
+    ),
+    Source(
+        key="enflasyon_karsilastirma",
+        title="Yillik Enflasyon Oranlari: TUIK / KKTC / ITO",
+        fetch=enflasyon_karsilastirma.fetch,
         daily_at_tr="19:00",
         group="BIST Genislik Gostergeleri",
     ),

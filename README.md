@@ -148,6 +148,33 @@ always-on task olarak `scheduler.py` calisiyor)
     `templates/bist100_bank_excess_return.html`, `bist100_excess_return.html`
     ile ayni gorsel dil, uc fiyat cizgisi (turkuaz XU100 TL, mor XU100
     USD, sari XBANK TL).
+  - `enflasyon_karsilastirma.py` - piyasa verisi degil, resmi enflasyon
+    istatistigi: yillik % TUFE (TUIK), KKTC TUFE, ITO Ucretliler
+    Gecinme Endeksi, kullanicinin verdigi referans gorseldeki 3 seriyle
+    ayni. Her kurumun kendi (belgelenmemis) veri kaynagindan cekiliyor:
+    - TUIK: TCMB EVDS3'un web arayuzunun kullandigi ic servis
+      (POST evds3.tcmb.gov.tr/igmevdsms-dis/fe, seri TP.GENENDEKS.T1,
+      formulas=3) - tarayicida "Tablo Olustur" tiklanip ag istekleri
+      izlenerek bulundu, kimlik dogrulama gerekmiyor. EVDS'in resmi API
+      key gerektiren REST servisi (/service/evds/) artik sadece SPA
+      kabugu donduruyor, kullanilamiyor.
+    - KKTC: istatistik.gov.ct.tr'nin "Tablolar (MS EXCEL)" sayfasindaki
+      guncel arsiv .xls dosyasi (dosya adi her ay degisiyor, sayfadan
+      otomatik bulunuyor), xlrd ile okunuyor.
+    - ITO: ististatistik.ito.org.tr'nin ic AJAX endpoint'i
+      (POST view/rapor05/index.php, IndeksId=3), tum yillari tek
+      istekte donduruyor. NOT: pandas.read_html "11,17" gibi virgullu
+      ondalik sayilari binlik ayiraci sanip 1117'ye cevirdigi icin
+      (dogrulanmis bug) tablo duz regex ile ayikliyor.
+    Uc kurum da farkli tarihlerde yayimladigi icin (TUIK/KKTC ~ayin
+    3-5'i, ITO ayin 1'i) sabit bir "ayin X. gunu" kurali yerine diger
+    BIST kartlariyla ayni sekilde gunde 1 kez kontrol ediliyor
+    (`daily_at_tr="19:00"`) - fetch() her zaman o an mevcut olan en
+    guncel veriyi cektigi icin, hangi kurum ne zaman yayimlarsa
+    yayimlasin bir sonraki gunluk kontrolde kart otomatik guncellenir.
+    Sayfasi `templates/enflasyon_karsilastirma.html` icinde uc cizgili
+    tek grafik (kirmizi TUIK, mavi KKTC, yesil ITO), lejanttan
+    acilir/kapanir.
 - `static/date-range-slider.js` - grafik kartlarinin altina eklenen, yeniden
   kullanilabilir cift tutamacli tarih araligi kaydiricisi (mini onizleme +
   Chart.js x ekseni zoom).

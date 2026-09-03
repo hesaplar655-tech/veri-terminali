@@ -75,6 +75,7 @@ CUSTOM_TEMPLATES = {
     "bist100_sector_drawdown": "bist100_sector_drawdown.html",
     "bist100_excess_return": "bist100_excess_return.html",
     "bist100_bank_excess_return": "bist100_bank_excess_return.html",
+    "enflasyon_karsilastirma": "enflasyon_karsilastirma.html",
 }
 
 
