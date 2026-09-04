@@ -172,9 +172,26 @@ always-on task olarak `scheduler.py` calisiyor)
     (`daily_at_tr="19:00"`) - fetch() her zaman o an mevcut olan en
     guncel veriyi cektigi icin, hangi kurum ne zaman yayimlarsa
     yayimlasin bir sonraki gunluk kontrolde kart otomatik guncellenir.
-    Sayfasi `templates/enflasyon_karsilastirma.html` icinde uc cizgili
-    tek grafik (kirmizi TUIK, mavi KKTC, yesil ITO), lejanttan
-    acilir/kapanir.
+    Sayfasi `templates/enflasyon_karsilastirma.html` icinde dort cizgili
+    tek grafik (kirmizi TUIK, mavi KKTC, yesil ITO 1995=100, turuncu
+    kesikli ITO 2023=100 - ITO'nun guncel basin bultenlerinde one cikan
+    yeni endeksi, farkli metodoloji/sepet, gecmisi sadece 2024'ten
+    itibaren; ikisi de gosteriliyor cunku farkli ama gecerli iki resmi
+    seri), lejanttan acilir/kapanir.
+  - `fx_dxy_us10y_correlation.py` - DXY (TVC:DXY, dolar endeksi) ile ABD
+    10 yillik tahvil faizi (TVC:US10Y) arasindaki 30/60/90 gunluk kayan
+    pencereli Pearson korelasyonu, TradingView (tvDatafeed) uzerinden.
+    Korelasyon ham fiyat/faiz seviyeleri degil gunluk % getiriler
+    uzerinden hesaplaniyor (trend kaynakli yaniltici korelasyonu onlemek
+    icin - iki seri de uzun sureli ayni yonde surukleniyorsa ham
+    seviyeler yaniltici sekilde yuksek korelasyon gosterebilir).
+    `daily_at_tr="23:45"` - 23:00 degil, cunku ABD tahvil piyasasi
+    kapanisi tam 23:00 TR'ye denk geliyor ve TradingView o gunun son
+    gunluk barini o saatte henuz yayinlamamis olabiliyor (SP500
+    kartlarindaki ayni duzeltme). Kendi grubu "FX Gostergeleri" altinda
+    listeleniyor. Sayfasi `templates/fx_dxy_us10y_correlation.html`
+    icinde uc cizgili tek grafik (turkuaz 30g, sari 60g, mor 90g),
+    y ekseni sabit -1..+1, sifir cizgisi vurgulu.
 - `static/date-range-slider.js` - grafik kartlarinin altina eklenen, yeniden
   kullanilabilir cift tutamacli tarih araligi kaydiricisi (mini onizleme +
   Chart.js x ekseni zoom).
