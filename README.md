@@ -192,6 +192,17 @@ always-on task olarak `scheduler.py` calisiyor)
     listeleniyor. Sayfasi `templates/fx_dxy_us10y_correlation.html`
     icinde uc cizgili tek grafik (turkuaz 30g, sari 60g, mor 90g),
     y ekseni sabit -1..+1, sifir cizgisi vurgulu.
+  - `sp500_mag7_momentum_correlation.py` - Magnificent 7 (CBOE:MAGS) ile
+    momentum faktoru (CBOE:MTUM) arasindaki 21 seanslik kayan pencereli
+    Pearson korelasyonu, TradingView (tvDatafeed) uzerinden, gunluk %
+    getiriler uzerinden hesaplanip (fx_dxy_us10y_correlation.py ile ayni
+    yontem). Veri MAGS'in islem gormeye basladigi 2023 Kasim'inden
+    itibaren mevcut - fetch() ikisinin ortak en erken tarihinden baslar.
+    `daily_at_tr="23:45"` (ABD borsa kapanisi + tampon, ayni gerekce).
+    Kendi grubu "SP500 Korelasyonlar" altinda listeleniyor. Sayfasi
+    `templates/sp500_mag7_momentum_correlation.html` icinde tek dolgulu
+    (filled area) cizgi grafik, y ekseni sabit -1..+1, sifir cizgisi
+    vurgulu.
 - `static/date-range-slider.js` - grafik kartlarinin altina eklenen, yeniden
   kullanilabilir cift tutamacli tarih araligi kaydiricisi (mini onizleme +
   Chart.js x ekseni zoom).

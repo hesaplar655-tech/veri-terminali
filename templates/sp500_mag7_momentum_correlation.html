@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}{{ source.title }} - Veri Terminali{% endblock %}
+{% block content %}
+  <p><a href="{{ url_for('panel') }}">&larr; panel</a></p>
+  <h1>{{ source.title }}</h1>
+  {% if record %}
+    <p class="ts">son guncelleme: {{ record.guncellenme_zamani }} (TR saatiyle her gun 23:45'te)</p>
+
+    <div class="chart-controls">
+      <span class="size-controls">
+        <label>Genislik (px): <input type="number" id="chart-width" min="200" max="4000" step="10" placeholder="otomatik"></label>
+        <label>Yukseklik (px): <input type="number" id="chart-height" min="150" max="3000" step="10" placeholder="otomatik"></label>
+        <button type="button" id="apply-size" class="btn-sm">Uygula</button>
+        <button type="button" id="reset-size" class="btn-sm btn-sm-ghost">Sifirla</button>
+      </span>
+    </div>
+    <div class="chart-wrap" id="chart-wrap">
+      <canvas id="chart"></canvas>
+    </div>
+    <div id="date-range-slider"></div>
+    <p class="ts">
+      Magnificent 7 (CBOE:MAGS) ile momentum faktoru (CBOE:MTUM)
+      arasindaki, gunluk yuzde degisimler uzerinden hesaplanan 21 seanslik
+      kayan pencereli Pearson korelasyonu. +1 = iki seri her zaman ayni
+      yonde hareket ediyor, -1 = tam ters yonde, 0 = iliski yok. Ham fiyat
+      seviyeleri degil gunluk getiriler kullaniliyor (trend kaynakli
+      yaniltici korelasyonu onlemek icin). Veri, MAGS'in islem gormeye
+      basladigi 2023 Kasim'indan itibaren mevcut. Veriler TradingView'den
+      (tvDatafeed).
+    </p>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="{{ url_for('static', filename='date-range-slider.js') }}"></script>
+    <script>
+      const veri = {{ record.veri | tojson }};
+      const etiketler = veri.map(d => d.tarih);
+      const k21 = veri.map(d => d.korelasyon_21s ?? null);
+
+      const ctx = document.getElementById('chart').getContext('2d');
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: etiketler,
+          datasets: [
+            {
+              label: '21 seanslik korelasyon',
+              data: k21,
+              borderColor: '#7c93e0',
+              backgroundColor: 'rgba(124, 147, 224, 0.25)',
+              pointRadius: 0,
+              borderWidth: 1.25,
+              fill: true,
+              tension: 0.1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: {
+              ticks: { color: '#8a90a2', maxTicksLimit: 12 },
+              grid: { color: '#1c2130' },
+            },
+            y: {
+              min: -1,
+              max: 1,
+              ticks: { color: '#8a90a2' },
+              grid: { color: (c) => c.tick.value === 0 ? '#4a5164' : '#1c2130' },
+              title: { display: true, text: 'Pearson korelasyon', color: '#8a90a2' },
+            },
+          },
+          plugins: {
+            legend: { labels: { color: '#e6e8ee' } },
+            tooltip: {
+              callbacks: {
+                label: (item) => `${item.dataset.label}: ${item.parsed.y.toFixed(2)}`,
+              },
+            },
+          },
+        },
+      });
+
+      createDateRangeSlider({
+        container: document.getElementById('date-range-slider'),
+        dates: etiketler,
+        values: k21,
+        chart: chart,
+      });
+
+      // Kullanicinin girdigi genislik/yukseklige gore grafik boyutu
+      const wrap = document.getElementById('chart-wrap');
+      const widthInput = document.getElementById('chart-width');
+      const heightInput = document.getElementById('chart-height');
+      const STORAGE_KEY = 'sp500_mag7_momentum_correlation_size';
+
+      function applySize(width, height) {
+        wrap.style.width = width ? width + 'px' : '';
+        wrap.style.height = height ? height + 'px' : '';
+        wrap.style.maxWidth = width ? 'none' : '';
+        wrap.style.maxHeight = height ? 'none' : '';
+        chart.resize();
+      }
+
+      function saveSize(width, height) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ width, height }));
+        } catch (e) { /* localStorage yoksa sessizce gec */ }
+      }
+
+      document.getElementById('apply-size').addEventListener('click', () => {
+        const width = parseInt(widthInput.value, 10) || null;
+        const height = parseInt(heightInput.value, 10) || null;
+        applySize(width, height);
+        saveSize(width, height);
+      });
+
+      document.getElementById('reset-size').addEventListener('click', () => {
+        widthInput.value = '';
+        heightInput.value = '';
+        applySize(null, null);
+        saveSize(null, null);
+      });
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if (saved && (saved.width || saved.height)) {
+          if (saved.width) widthInput.value = saved.width;
+          if (saved.height) heightInput.value = saved.height;
+          applySize(saved.width, saved.height);
+        }
+      } catch (e) { /* localStorage yoksa sessizce gec */ }
+    </script>
+  {% else %}
+    <p class="ts">Bu sayfa icin henuz veri cekilmedi. Scheduler calistiginda burasi dolacak (TR saatiyle her gun 23:45).</p>
+  {% endif %}
+{% endblock %}

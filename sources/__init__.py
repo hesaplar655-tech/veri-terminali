@@ -15,7 +15,7 @@ Zamanlama iki sekilde tanimlanabilir (birini kullan):
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from sources import ekonomik_takvim, sp500_concentration, sp500_breadth, market_relative, sector_breadth, index_breadth, rsi_breadth, bist100_rsi_breadth, bist100_breadth, bist100_ma_breadth, bist100_sector_drawdown, bist100_excess_return, bist100_bank_excess_return, enflasyon_karsilastirma, fx_dxy_us10y_correlation
+from sources import ekonomik_takvim, sp500_concentration, sp500_breadth, market_relative, sector_breadth, index_breadth, rsi_breadth, bist100_rsi_breadth, bist100_breadth, bist100_ma_breadth, bist100_sector_drawdown, bist100_excess_return, bist100_bank_excess_return, enflasyon_karsilastirma, fx_dxy_us10y_correlation, sp500_mag7_momentum_correlation
 
 
 @dataclass
@@ -129,5 +129,12 @@ SOURCES: list[Source] = [
         fetch=fx_dxy_us10y_correlation.fetch,
         daily_at_tr="23:45",
         group="FX Gostergeleri",
+    ),
+    Source(
+        key="sp500_mag7_momentum_correlation",
+        title="Magnificent 7 - Momentum Faktoru Korelasyonu (21s)",
+        fetch=sp500_mag7_momentum_correlation.fetch,
+        daily_at_tr="23:45",
+        group="SP500 Korelasyonlar",
     ),
 ]

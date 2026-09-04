@@ -77,6 +77,7 @@ CUSTOM_TEMPLATES = {
     "bist100_bank_excess_return": "bist100_bank_excess_return.html",
     "enflasyon_karsilastirma": "enflasyon_karsilastirma.html",
     "fx_dxy_us10y_correlation": "fx_dxy_us10y_correlation.html",
+    "sp500_mag7_momentum_correlation": "sp500_mag7_momentum_correlation.html",
 }
 
 
