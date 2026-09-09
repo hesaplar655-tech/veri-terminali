@@ -29,6 +29,18 @@ Not: Bu ticker'lar TradingView'in resmi/belgelenmis bir API'si degil,
 sembol arama sonuclarindan tespit edildi - ileride kaynak tarafinda
 degisirse (sembol kaldirilir/yeniden adlandirilirsa) fetch() o sektor icin
 hata verip loglar, digerlerini etkilemez.
+
+Zamanlama: daily_at_tr yerine SAATLIK calisiyor (interval_unit="hours").
+Sebep: Barchart kaynakli "genislik" (INDEX:*TW) serileri, fiyat (XL*)
+serilerinden daha GEC yayimlaniyor - ABD borsa kapanisindan (20:00 UTC)
+45 dk sonra (23:45 TR / 20:45 UTC) bile o gunun barini henuz vermeyebiliyor,
+bazen ancak ertesi gun yayimlaniyor. fetch() iki seriyi ORTAK tarihlerine
+gore kesistirdigi icin (bkz. asagida), genislik gecikirse kart bir onceki
+gune takili kaliyordu. Saatlik tekrar calistirarak, genislik verisi ne
+zaman yayimlanirsa yayimlansin bir sonraki calismada otomatik yakalaniyor
+(gunluk fiyat kaynakli kartlardaki sabit saat duzeltmesinin aksine, burada
+"ne kadar gec olacagi" onceden bilinmedigi icin tek seferlik saat ayari
+yerine tekrarlayan kontrol tercih edildi).
 """
 from datetime import timezone, timedelta
 

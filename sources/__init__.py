@@ -60,7 +60,8 @@ SOURCES: list[Source] = [
         key="sector_breadth",
         title="Sektor Genislikleri (% 20g MA Uzeri)",
         fetch=sector_breadth.fetch,
-        daily_at_tr="23:45",
+        interval_unit="hours",
+        interval_value=1,
     ),
     Source(
         key="index_breadth",

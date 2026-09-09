@@ -48,7 +48,14 @@ always-on task olarak `scheduler.py` calisiyor)
     SBTW, SSTW, SLTW, SUTW, S&P 500 icin S5TW) TradingView'in kendi sembol
     arama API'sinden (symbol-search.tradingview.com, Barchart kaynakli)
     bulundu - resmi/belgelenmis degil, sembol arama sonuclarindan tespit
-    edildi ve tvDatafeed ile dogrulandi. Sayfasi `templates/sector_breadth.html`
+    edildi ve tvDatafeed ile dogrulandi. `daily_at_tr` yerine SAATLIK
+    calisiyor (`interval_unit="hours"`) - Barchart kaynakli breadth
+    serileri fiyat serilerinden daha gec yayimlandigi icin (ABD kapanisi +
+    45 dk'da bile o gunun barini vermeyebiliyor), sabit bir gunluk saat
+    yerine tekrarlayan saatlik kontrolle veri ne zaman yayimlanirsa
+    yayimlansin bir sonraki calismada yakalaniyor (2026-09-09'da tespit
+    edilen "kart bir onceki gunde takili kaliyor" bugu icin bu sekilde
+    duzeltildi). Sayfasi `templates/sector_breadth.html`
     icinde 12 kartlik bir izgara (chartjs-chart-financial ile gercek mum
     grafik + breadth cizgisi, ikisi de lejanttan acilir/kapanir); bir karta
     tiklayinca buyutulmus, kendi tarih araligi kaydiricili bir modalda acilir;
