@@ -199,6 +199,15 @@ always-on task olarak `scheduler.py` calisiyor)
     listeleniyor. Sayfasi `templates/fx_dxy_us10y_correlation.html`
     icinde uc cizgili tek grafik (turkuaz 30g, sari 60g, mor 90g),
     y ekseni sabit -1..+1, sifir cizgisi vurgulu.
+  - `fx_dxy_us02y_correlation.py` - DXY (TVC:DXY) ile ABD 2 yillik tahvil
+    faizi (TVC:US02Y) arasindaki 30/60/90 gunluk kayan pencereli Pearson
+    korelasyonu - `fx_dxy_us10y_correlation.py` ile ayni yontem (gunluk %
+    getiriler uzerinden), ayni sebeple `daily_at_tr="23:45"`. 2 yillik
+    faiz 10 yillikten farkli olarak Fed politika/kisa vadeli faiz
+    beklentilerine daha duyarli oldugu icin ayri bir kart. Kendi grubu
+    "FX Gostergeleri" altinda, DXY-US10Y kartinin yaninda listeleniyor.
+    Sayfasi `templates/fx_dxy_us02y_correlation.html` - ayni gorsel dil
+    (uc cizgili tek grafik, y ekseni sabit -1..+1, sifir cizgisi vurgulu).
   - `sp500_mag7_momentum_correlation.py` - Magnificent 7 (CBOE:MAGS) ile
     momentum faktoru (CBOE:MTUM) arasindaki 21 seanslik kayan pencereli
     Pearson korelasyonu, TradingView (tvDatafeed) uzerinden, gunluk %
