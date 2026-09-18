@@ -65,7 +65,13 @@ always-on task olarak `scheduler.py` calisiyor)
     uyeler 50/200 gunluk ortalamanin uzerinde" (INDEX:S5FI/S5TH,
     INDEX:NCFI/NCTH, INDEX:R2FI/R2TH). S&P 500 disindaki ticker'lar da
     TradingView'in sembol arama API'sinden bulunup tvDatafeed ile
-    dogrulandi. Sayfasi `templates/index_breadth.html` icinde iki ust uste
+    dogrulandi. `daily_at_tr` yerine SAATLIK calisiyor (`interval_unit=
+    "hours"`) - sector_breadth.py ile ayni sebep: Barchart kaynakli
+    breadth serileri gec yayimlanabiliyor, sabit gunluk saat yerine
+    tekrarlayan saatlik kontrolle veri ne zaman gelirse gelsin bir
+    sonraki calismada yakalaniyor (2026-09-19'da tespit edilen "kart bir
+    onceki gunde takili kaliyor" bugu icin duzeltildi). Sayfasi
+    `templates/index_breadth.html` icinde iki ust uste
     grafik (50g, 200g), uc endeks de lejanttan acilir/kapanir, her grafigin
     kendi bagimsiz tarih araligi kaydiricisi var (biri digerini zoomlamaz).
   - `rsi_breadth.py` - S&P 500 uyelerinin yuzde kacinin 14 gunluk RSI'i 70'in

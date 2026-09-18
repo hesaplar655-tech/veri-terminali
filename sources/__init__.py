@@ -67,7 +67,8 @@ SOURCES: list[Source] = [
         key="index_breadth",
         title="Endeks Genislikleri: S&P 500 / Nasdaq / Russell 2000",
         fetch=index_breadth.fetch,
-        daily_at_tr="23:45",
+        interval_unit="hours",
+        interval_value=1,
     ),
     Source(
         key="rsi_breadth",

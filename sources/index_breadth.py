@@ -13,6 +13,15 @@ Barchart kaynakli) bulundu ve tvDatafeed ile dogrulandi:
 Bu ticker'lar TradingView'in resmi/belgelenmis bir public API'si degil -
 sembol arama sonuclarindan tespit edildi. Ileride kaldirilir/degisirse
 fetch() hata verir, scheduler loglarinda gorunur.
+
+Zamanlama: daily_at_tr yerine SAATLIK calisiyor (interval_unit="hours") -
+tipki sector_breadth.py'deki ayni sebeple: Barchart kaynakli bu breadth
+(INDEX:*FI/*TH) serileri fiyat serilerinden daha gec yayimlaniyor, ABD
+kapanisi + 45 dk'da (eski daily_at_tr="23:45") bile o gunun barini
+vermeyebiliyor, bu da kartin bir onceki gune takili kalmasina yol
+aciyordu (kullanici raporu, 2026-09-19: kart 16 Eylul'de takili kalmis,
+17 Eylul olmasi gerekiyordu). Saatlik tekrar calistirarak veri ne zaman
+yayimlanirsa yayimlansin bir sonraki calismada otomatik yakalaniyor.
 """
 from datetime import timezone, timedelta
 
@@ -29,6 +38,8 @@ TICKERS = {
 
 def _fetch_close(tv, symbol):
     df = tv.get_hist(symbol=symbol, exchange="INDEX", interval=Interval.in_daily, n_bars=N_BARS)
+    if df is None or df.empty:
+        return {}
     out = {}
     for ts, row in df.iterrows():
         ts_tr = ts.tz_localize("UTC").astimezone(TR_TZ) if ts.tzinfo is None else ts.astimezone(TR_TZ)
