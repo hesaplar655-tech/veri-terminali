@@ -20,7 +20,7 @@ TR saatiyle gunde 1 kez (23:00) calisir.
 import pandas as pd
 from tvDatafeed import TvDatafeed
 
-from sources.bist100_common import BIST100_SEMBOLLER, START_DATE, gunluk_seri
+from sources.bist100_common import BIST100_SEMBOLLER, GUNCEL_DONEM_BASLANGIC, gunluk_seri, sabit_gecmis
 
 MA_PERIODS = (50, 200)
 MIN_KAPSAMA = 0.7  # gunun gecerli sayilmasi icin hisselerin en az %70'inde ilgili MA olmali
@@ -55,8 +55,8 @@ def fetch():
         ustunde_df = pd.DataFrame(ustunde_serileri).sort_index()
         gunluk = {}
         for tarih, satir in ustunde_df.iterrows():
-            if tarih < START_DATE:
-                continue
+            if tarih < GUNCEL_DONEM_BASLANGIC:
+                continue  # oncesi sabit (sources/sabit/), bkz. bist100_common.py
             gecerli = satir.dropna()
             if len(gecerli) < min_hisse:
                 continue
@@ -64,7 +64,7 @@ def fetch():
         gunluk_yuzdeler[period] = gunluk
 
     ortak_tarihler = sorted(set(gunluk_yuzdeler[50]) & set(gunluk_yuzdeler[200]))
-    return [
+    return sabit_gecmis("bist100_ma_breadth") + [
         {
             "tarih": tarih,
             "ustunde_50g_yuzde": gunluk_yuzdeler[50][tarih],

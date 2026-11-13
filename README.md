@@ -102,7 +102,16 @@ always-on task olarak `scheduler.py` calisiyor)
     (tr.tradingview.com/symbols/BIST-XU100/components/) ve Midas
     (getmidas.com/canli-borsa/xu100-bist-100-hisseleri) ile capraz
     kontrol edilip koda sabit olarak yazildi - BIST 100 bilesimi ceyreklik
-    degisebildigi icin bu liste zamanla hafifce eskiyebilir. RSI(14)
+    degisebildigi icin bu liste zamanla hafifce eskiyebilir. Endeks
+    degisikliklerinde gecmis SABIT kaliyor: `BIST100_SEMBOLLER` guncel
+    donemin listesi ve sadece `GUNCEL_DONEM_BASLANGIC`'tan (su an
+    2026-10-01, Ekim-Aralik 2026 bilesimi, 27 giris / 27 cikis) itibaren
+    hesaplaniyor; oncesi `sources/sabit/<key>.json`'dan okunuyor (canli
+    sitedeki degerlerden oldugu gibi donduruldu, bir daha hesaplanmaz).
+    Sunucu her gun sadece guncel 100 hisseyi cekiyor. Yeni bir ceyreklik
+    degisiklikte: o gunku canli veriyi yeni yururluk tarihine kadar sabit
+    dosyalara ekle, listeyi ve `GUNCEL_DONEM_BASLANGIC`'i guncelle. Bu,
+    `bist100_breadth.py` ve `bist100_ma_breadth.py` icin de gecerli. RSI(14)
     Wilder'in yumusatma yontemiyle hesaplaniyor. Karsilastirma icin BIST
     100 endeksinin hem TL (BIST:XU100) hem dolar (BIST:XU100.USD) kapanis
     fiyati da TradingView'den cekilip iki ayri sag eksende cizgi olarak

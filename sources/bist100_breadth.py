@@ -21,7 +21,9 @@ TR saatiyle gunde 1 kez (23:00) calisir.
 import pandas as pd
 from tvDatafeed import TvDatafeed
 
-from sources.bist100_common import BIST100_SEMBOLLER, START_DATE, gunluk_seri, xu100_serileri
+from sources.bist100_common import (
+    BIST100_SEMBOLLER, GUNCEL_DONEM_BASLANGIC, gunluk_seri, sabit_gecmis, xu100_serileri,
+)
 
 MA_PERIOD = 200
 MIN_KAPSAMA = 0.7  # gunun gecerli sayilmasi icin hisselerin en az %70'inde 200g MA olmali
@@ -56,8 +58,8 @@ def fetch():
     min_hisse = int(len(ustunde_serileri) * MIN_KAPSAMA)
     events = []
     for tarih, satir in ustunde_df.iterrows():
-        if tarih < START_DATE:
-            continue
+        if tarih < GUNCEL_DONEM_BASLANGIC:
+            continue  # oncesi sabit (sources/sabit/), bkz. bist100_common.py
         gecerli = satir.dropna()
         if len(gecerli) < min_hisse:
             continue
@@ -73,4 +75,4 @@ def fetch():
             event["xu100_usd"] = round(xu100_usd[tarih], 3)
         events.append(event)
 
-    return events
+    return sabit_gecmis("bist100_breadth") + events
