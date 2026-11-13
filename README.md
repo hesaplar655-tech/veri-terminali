@@ -235,7 +235,13 @@ always-on task olarak `scheduler.py` calisiyor)
   - `/` - giris sayfasi: bugunun tarihi + gecen hafta ile onumuzdeki hafta
     arasi (bugun-7 .. bugun+6, 14 gun, bugun dahil, her gun icin ayri blok)
     ekonomik takvim, "Devam Et" butonu.
-  - `/panel` - diger veri kaynaklarinin kart goruntusu (ekonomik takvim disinda).
+  - `/panel` - "Devam Et"ten sonra gelen secim ekrani, iki buyuk kart:
+    "Piyasa Gostergeleri" ve "Sirket Analizleri".
+  - `/panel/piyasa-gostergeleri` - diger veri kaynaklarinin kart goruntusu
+    (ekonomik takvim disinda, `templates/piyasa_gostergeleri.html`). Kart detay
+    sayfalarindaki geri linki buraya doner.
+  - `/panel/sirket-analizleri` - sirket analizi kartlari icin ayrilan bolum
+    (`templates/sirket_analizleri.html`), su an bos.
   - `/sayfa/<key>` - bir kartin detay sayfasi (su an ham JSON basiyor, ozellestirilecek).
 - `templates/`, `static/` - sayfa goruntusu.
 

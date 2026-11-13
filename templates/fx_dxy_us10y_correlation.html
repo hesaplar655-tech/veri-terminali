@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}{{ source.title }} - Veri Terminali{% endblock %}
 {% block content %}
-  <p><a href="{{ url_for('panel') }}">&larr; panel</a></p>
+  <p><a href="{{ url_for('piyasa_gostergeleri') }}">&larr; piyasa göstergeleri</a></p>
   <h1>{{ source.title }}</h1>
   {% if record %}
     <p class="ts">son guncelleme: {{ record.guncellenme_zamani }} (TR saatiyle her gun 23:45'te)</p>

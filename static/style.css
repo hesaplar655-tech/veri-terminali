@@ -443,3 +443,30 @@ table th {
   font-weight: 700;
   margin-bottom: 0.4rem;
 }
+
+/* /panel secim ekrani: Piyasa Gostergeleri / Sirket Analizleri */
+.bolum-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  max-width: 820px;
+  margin: 3rem auto;
+}
+
+.bolum-card {
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.bolum-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.bolum-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+}

@@ -1,24 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Panel - Veri Terminali{% endblock %}
 {% block content %}
-  {% for grup_adi, sayfalar in gruplar %}
-    <h1>{{ grup_adi }}</h1>
-    <div class="card-grid">
-      {% for p in sayfalar %}
-        <a class="card" href="{{ url_for('page', key=p.key) }}">
-          <div class="card-title">{{ p.title }}</div>
-          <div class="ts">
-            {% if p.guncellenme_zamani %}
-              son guncelleme: {{ p.guncellenme_zamani }}
-            {% else %}
-              henuz veri yok
-            {% endif %}
-          </div>
-        </a>
-      {% endfor %}
-    </div>
-  {% else %}
-    <h1>Veriler</h1>
-    <p class="ts">Henuz bir kart eklenmedi.</p>
-  {% endfor %}
+  <div class="bolum-grid">
+    <a class="card bolum-card" href="{{ url_for('piyasa_gostergeleri') }}">
+      <div class="bolum-title">Piyasa Göstergeleri</div>
+      <div class="ts">SP500, BIST, FX ve enflasyon kartları</div>
+    </a>
+    <a class="card bolum-card" href="{{ url_for('sirket_analizleri') }}">
+      <div class="bolum-title">Şirket Analizleri</div>
+      <div class="ts">Yakında</div>
+    </a>
+  </div>
 {% endblock %}

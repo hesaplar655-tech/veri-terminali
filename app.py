@@ -49,6 +49,12 @@ def giris():
 
 @app.route("/panel")
 def panel():
+    """Devam Et'ten sonra gelen secim ekrani: Piyasa Gostergeleri / Sirket Analizleri."""
+    return render_template("panel.html")
+
+
+@app.route("/panel/piyasa-gostergeleri")
+def piyasa_gostergeleri():
     gruplar = {}
     for source in SOURCES:
         if source.key == GIRIS_KAYNAK_KEY:
@@ -59,7 +65,13 @@ def panel():
             "title": source.title,
             "guncellenme_zamani": record["guncellenme_zamani"] if record else None,
         })
-    return render_template("panel.html", gruplar=gruplar.items())
+    return render_template("piyasa_gostergeleri.html", gruplar=gruplar.items())
+
+
+@app.route("/panel/sirket-analizleri")
+def sirket_analizleri():
+    # Henuz icerik yok - ileride sirket analizi kartlari buraya eklenecek.
+    return render_template("sirket_analizleri.html")
 
 
 CUSTOM_TEMPLATES = {
